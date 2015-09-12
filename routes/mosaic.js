@@ -28,6 +28,7 @@ router.post('/', function (req, res, next) {
         coords.push(point);
       });
       var distance = function (a, b) {
+        
         return Math.pow(a.r - b.r, 2) + Math.pow(a.g - b.g, 2) + Math.pow(a.b - b.b, 2);
       };
       var tree = kdt.createKdTree(coords, distance, ["r", "g", "b"]);
