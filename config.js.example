@@ -1,0 +1,6 @@
+var config = {};
+
+config.fbAppID = "";
+config.fbAppSecret = "";
+
+module.exports = config;
