@@ -7,38 +7,53 @@
 	MosaicNinja is ...
 	</div>
 
-	<ul>
+	<div class="btn-group">
 	
-	<li class="dropdown ">
-		You are what you
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-          <ul class="dropdown-menu ">
-            <li><a href="#">LIKE</a></li>
-            <li><a href="#">EAT</a></li>
-            <li><a href="#">EXPERIENCE</a></li>
-            
-          </ul>
-    </li>
-    </ul>
+	    <button class="btn">You are what you</button>
+	    <button class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	    <span class="caret"></span>
+	   </button>
+	 <ul class="dropdown-menu" class="list-unstyled" role="menu" aria-labelledby="dropdownMenu">
 
-	<div id="status">
+	   <li><a tabindex="-1" href="#">You are what you Like</a></li>
+	   <li><a tabindex="-1" href="#">You are what you Eat</a></li>
+	   <li><a tabindex="-1" href="#">You are what you Experience</a></li>
+	   
+	 </ul>
+	</div>
+	
+	
+	
+
+	<div class="container" id="status">
 		<div class="row">
   			<div class="col-xs-6 col-md-4">
   			<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
-</fb:login-button>
+			</fb:login-button>
 			</div>
 
 			
 		</div>
 	</div>
-	
+
+	<br>
+	<br>
+
 	<div id='mosaicgenerator'type="button"class="btn btn-default">
 			Mosaic Generator
 	</div>
 
+	<br>
+	<br>
+
+	<div class="progress">
+  	<div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+    60%
+  	</div>
+</div>
 
 
-	  	<p class="">message</p>
+	<p class="">message</p>
 
 
 </div>
