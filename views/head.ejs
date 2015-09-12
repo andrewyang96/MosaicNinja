@@ -18,7 +18,7 @@
 <body>
 <script type="text/javascript" src="/components/jquery/dist/jquery.min.js"></script>
 
-<script>
+<!--<script>
 
 function statusChangeCallback(response) {
     console.log('statusChangeCallback');
@@ -31,8 +31,6 @@ function statusChangeCallback(response) {
       // Logged into your app and Facebook.
       authData = response.authResponse;
       console.log(authData);
-      
-
       testAPI();
     } else if (response.status === 'not_authorized') {
       // The person is logged into Facebook, but not your app.
@@ -52,7 +50,7 @@ function statusChangeCallback(response) {
   // code below.
   function checkLoginState() {
     FB.getLoginStatus(function(response) {
-      console.log("test");
+      
       statusChangeCallback(response);
     });
   }
@@ -74,7 +72,7 @@ window.fbAsyncInit = function() {
 
     FB.init({
       appId      : '1580113125600195',
-      cookie     : true, 
+      
       xfbml      : true,
       version    : 'v2.4'
     });
@@ -91,6 +89,54 @@ window.fbAsyncInit = function() {
     
 
 </script>
+-->
+<script type="text/javascript">
+      
+      // Initialize the Facebook JavaScript SDK
+      window.fbAsyncInit = function() {
+      FB.init({
+        appId: '1580113125600195',
+        xfbml: true,
+        status: true,
+        cookie: true,
+        version: 'v2.4'
+      });
+      FB.getLoginStatus(checkLoginStatus);
+      };
+      (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+      // Check if the current user is logged in and has authorized the app
+      FB.getLoginStatus(checkLoginStatus);
+      
+      // Login in the current user via Facebook and ask for email permission
+      function authUser() {
+        FB.login(checkLoginStatus, {scope:'email'});
+      }
+      
+      // Check the result of the user status and display login button if necessary
+      function checkLoginStatus(response) {
+        if(response && response.status == 'connected') {
+          
+          
+          // Hide the login button
+          document.getElementById('loginButton').style.display = 'none';
+          
+          // Now Personalize the User Experience
+          console.log('Access Token: ' + response.authResponse.accessToken);
+        } else {
+          
+          
+          // Display the login button
+          document.getElementById('loginButton').style.display = 'block';
+        }
+      }
+    </script>
+    
 
 
 
