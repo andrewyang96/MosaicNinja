@@ -4,10 +4,10 @@ var router = express.Router();
 var config = require('../config');
 var request = require('request');
 var Facebook = require('facebook-node-sdk');
-var facebook = new Facebook({ appID: config.fbAppID, secret: config.fbAppSecret });
+var facebook = new Facebook({ appId: config.fbAppID, secret: config.fbAppSecret });
 
 var kdt = require('kdt');
-var base64 = require('node-base64-image');
+var request = require('request');
 var async = require('async');
 var _ = require('underscore');
 
@@ -18,12 +18,13 @@ router.post('/', function (req, res, next) {
     if (err) throw err;
     downloadPictures(likes, function (err, imageData) {
       if (err) throw err;
-      console.log(imageData);
+      console.log("Length of imageData:", Object.keys(imageData).length);
+      // console.log(imageData);
       // download profile picture
       downloadProfilePicture(req.body.fbid, function (err, propicImage) {
         if (err) throw err;
-        console.log(propicImage);
-        res.send('Mosaic making with theme ' + req.body.theme + ' started for ID ' + req.body.fbid);
+        // console.log(propicImage);
+        console.log("Done!");
       });
     });
   });
@@ -33,26 +34,40 @@ router.post('/', function (req, res, next) {
 
 var getLikes = function (id, callback) {
   facebook.api('/' + id + '/likes?limit=100', function (err, data) {
-    if (err) throw err;
-    extractLikes(data, function (err, likes) {
-      if (err) throw err;
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    console.log("Calling first 100");
+    extractLikes(data, id, function (err, likes) {
+      if (err) {
+        callback(err, null);
+        return;
+      }
       callback(null, likes);
     });
   });
 };
 
-var extractLikes = function (likes, callback) {
+var extractLikes = function (likes, id, callback) {
   // Helper function
   var likesObj = likes.data || [];
   var ret = [];
   for (var i = 0; i < likesObj.length; i++) {
     ret.push(likesObj[i].id);
   }
-  if (likes.paging.cursors.after) { // recursive case
+  if (likes.paging && likes.paging.cursors && likes.paging.cursors.after) { // recursive case
+    console.log("Calling next 100");
     facebook.api('/' + id + '/likes?limit=100&after=' + likes.paging.cursors.after, function (err, data) {
-      if (err) callback(err, null);
-      extractLikes(data, function (err, more) {
-        if (err) callback(err, null);
+      if (err) {
+        callback(err, null);
+        return;
+      }
+      extractLikes(data, id, function (err, more) {
+        if (err) {
+          callback(err, null);
+          return;
+        }
         callback(null, ret.concat(more));
       });
     });
@@ -64,30 +79,70 @@ var extractLikes = function (likes, callback) {
 var downloadPictures = function (likes, callback) {
   // likes - array of ids
   // returns map of id keys and base 64 object values
-  async.map(likes, function (like) {
-    facebook.api('/' + like.id + '/picture?width=50&height=50', function (err, likeObj) {
-      if (err) throw err;
+  console.log("Num likes:", likes.length);
+  var ret = {};
+  async.each(likes, function (like, cb) {
+    facebook.api('/' + like + '/picture?redirect=false&width=50&height=50', function (err, likeObj) {
+      if (err) {
+        cb(err, null);
+        return;
+      }
       // encode image to base64
-      base64.base64encode(likeObj.data.url, { string: true }, function (err, saved) {
-        if (err) throw err;
-        return saved;
+      encodeBase64(likeObj.data.url, function (err, image) {
+        if (err) {
+          cb(err, null);
+          return;
+        }
+        if (image) { // image could be null
+          ret[like] = image;
+        }
+        cb();
       });
     });
-  }, function (err, results) {
-    if (err) callback(err, null);
-    // zip the likes and results arrays
-    var retObj = _.object(likes, results);
-    callback(null, results);
+  }, function (err) {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    console.log("Returning thumbnails");
+    callback(null, ret);
   });
 };
 
 var downloadProfilePicture = function (id, callback) {
-  facebook.api('/' + req.body.fbid + '/picture?width=9999&height=9999', function (err, propicData) {
-    if (err) callback(err, null);
-    base64.base64encode(propicData.data.url, { string: true}, function (err, saved) {
-      if (err) callback(err, null);
-      callback(null, saved);
+  facebook.api('/' + id + '/picture?redirect=false&width=9999&height=9999', function (err, propicData) {
+    if (err) {
+      console.log("Error!");
+      callback(err, null);
+      return;
+    }
+    encodeBase64(propicData.data.url, function (err, image) {
+      if (err) {
+        callback(err, null);
+        return;
+      }
+      if (image) {
+        console.log("Big propic");
+        callback(null, image);
+      } else {
+        callback("image is null", null);
+      }
     });
+  });
+};
+
+var encodeBase64 = function (url, callback) {
+  request({url: url, encoding: null}, function (err, res, body) {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    if (body && res.statusCode === 200) {
+      var image = body.toString('base64');
+      callback(null, image);
+    } else {
+      callback(null, null);
+    }
   });
 };
 
