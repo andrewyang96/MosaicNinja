@@ -52,9 +52,11 @@ router.post('/', function (req, res, next) {
           mosaicsRef.child(req.body.fbid).set(nearests, function (error) {
             if (error) {
               console.log("Error storing mosaic for user", req.body.fbid);
+            } else {
+              console.log("Done!");
+              // TODO notify frontend to fetch mosaic data
             }
           });
-          // DONE! TODO: persist nearests 2d array to somewhere
         });
       });
     });
@@ -211,9 +213,13 @@ var getAverageColorOfRegion = function (pixels, xBounds, yBounds) {
   for (var x = xBounds[0]; x < xBounds[1]; x++) {
     for (var y = yBounds[0]; y < yBounds[1]; y++) {
       var pixel = pixels[0][y * 768 + x];
-      r += pixel.r;
-      g += pixel.g;
-      b += pixel.b;
+      if (pixel) {
+        r += pixel.r;
+        g += pixel.g;
+        b += pixel.b;
+      } else {
+        console.log("Warning: Pixel at x =", x, " y =", y, "is undefined");
+      }
     }
   }
   r /= numPixels;
