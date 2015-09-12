@@ -28,6 +28,7 @@ $(document).ready(function(){
 		$(".progress").show();
 		$('.message').show();
 		$("#mosaicgenerator").hide();
+		$(".btn-group").hide();
 	});
   
   $('#mosaicgenerator').hide();
