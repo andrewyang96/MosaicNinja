@@ -49,7 +49,7 @@ router.post('/', function (req, res, next) {
           if (err) throw err;
           var mosaic = splitProfilePicture(pixels); // optional resolution param
           var nearests = returnNearests(tree, mosaic);
-          mosaicsRef.child(req.body.fbid).set(to2DFirebaseArray(nearests), function (error) {
+          mosaicsRef.child(req.body.fbid).set(nearests, function (error) {
             if (error) {
               console.log("Error storing mosaic for user", req.body.fbid);
             }
@@ -258,18 +258,5 @@ var returnNearests = function (tree, mosaic) {
   }
   return ret;
 };
-
-var to2DFirebaseArray = function (arr) {
-  // add keys
-  var ret = {};
-  for (var row = 0; row < arr.length; row++) {
-    var rowRet = {};
-    for (var col = 0; col < arr[row].length; arr++) {
-      rowRet[col] = arr[row][col];
-    }
-    ret[row] = rowRet;
-  }
-  return ret;
-}
 
  module.exports = router;
