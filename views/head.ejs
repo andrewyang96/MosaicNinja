@@ -14,6 +14,7 @@
    
 </head>
 <body>
+<script type="text/javascript" src="/components/jquery/dist/jquery.min.js"></script>
 <script>
     function statusChangeCallback(response) {
     console.log('statusChangeCallback');
@@ -22,8 +23,11 @@
     // app know the current login status of the person.
     // Full docs on the response object can be found in the documentation
     // for FB.getLoginStatus().
+    
     if (response.status === 'connected') {
       // Logged into your app and Facebook.
+      authData = response.authResponse;
+      console.log(authData);
       testAPI();
     } else if (response.status === 'not_authorized') {
       // The person is logged into Facebook, but not your app.
@@ -36,12 +40,18 @@
         'into Facebook.';
     }
   }
+  function logout(){
+    FB.logout(function(response) {
+        // Person is now logged out
+    });
+  }
 
   // This function is called when someone finishes with the Login
   // Button.  See the onlogin handler attached to it in the sample
   // code below.
   function checkLoginState() {
     FB.getLoginStatus(function(response) {
+      console.log("test");
       statusChangeCallback(response);
     });
   }
@@ -63,11 +73,20 @@
      js.src = "//connect.facebook.net/en_US/sdk.js";
      fjs.parentNode.insertBefore(js, fjs);
    }(document, 'script', 'facebook-jssdk'));
+
+  function testAPI() {
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+      document.getElementById('status').innerHTML =
+        'Thanks for logging in, ' + response.name + '!';
+    });
+
+  }
 </script>
 
 
-<div id="status">
-</div>
+
 <!-- header -->
 <nav class="navbar navbar-default">
   <div class="container">
