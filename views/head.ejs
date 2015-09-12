@@ -14,6 +14,8 @@
     <link rel="stylesheet" type="text/css" href="/components/components-font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="/components/bootstrap-social/bootstrap-social.css">
 
+    <script type="text/javascript" src="/components/firebase/firebase.js"></script>
+
 </head>
 <body>
 
@@ -62,32 +64,31 @@
       authData = response.authResponse;
       console.log(authData);
       var ref = new Firebase("https://facebookmosaic.firebaseio.com/");
-      var mosaicsref= ref.child("mosaics").child(authData.userID);
+      var mosaicsref = ref.child("mosaics").child(authData.userID);
       
-      console.log("Loading firebase");
-      mosaicsref.on('child_changed',function (childSnapshot, prevChildKey){
-        mosaicsref.once('value',function (dataSnapshot){
+      console.log("Loading firebase", authData.userID);
+      mosaicsref.on('child_changed', function (childSnapshot, prevChildKey) {
+        console.log("Child_changed triggered");
+        mosaicsref.once('value', function (dataSnapshot) {
           var source = dataSnapshot.val();
           console.log(source);
           var canvas = document.getElementById('new_canvas');
           var context = canvas.getContext('2d');
           //actual
-          for(var row=0; row< source.length; row++){
-            for(var col=0;col<source[row].length;col++){
-              var ctx = document.getElementById('new_canvas').getContext('2d');
+          for(var row=0; row < source.length; row++){
+            for(var col=0;col < source[row].length;col++){
               var pixel = source[row][col];
               var img = new Image();
               img.src = "http://www.html5canvastutorials.com/demos/assets/darth-vader.jpg";
               //"data:image/jpeg;base64,"+pixel;
               img.onload = function () {
-                ctx.drawImage(this, row*50, col*50, 50, 50);
+                context.drawImage(this, row*50, col*50, 50, 50);
               };
             }
           }
         }, function (err){
           console.log("Error drawing canvas:", err);
         });
-      
       });
 
       // Hide the login button
@@ -104,11 +105,6 @@
   }
 
 </script>
-<script type="text/javascript" src="/components/firebase/firebase.js"></script>
-    
-
-
-
 
 
 <!-- header -->
