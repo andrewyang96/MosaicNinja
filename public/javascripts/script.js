@@ -14,6 +14,7 @@ $('#mosaicgenerator').click(function(){
 	})
 });
 
+
 $(document).ready(function(){
 	$(".dropdown-menu li a").click(function(){
 
