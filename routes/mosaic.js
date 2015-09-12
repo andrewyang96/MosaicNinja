@@ -74,3 +74,5 @@ var downloadPictures = function (likes, callback) {
     callback(null, results);
   });
 };
+
+ module.exports = router;
