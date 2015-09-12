@@ -7,7 +7,6 @@ var Facebook = require('facebook-node-sdk');
 var facebook = new Facebook({ appId: config.fbAppID, secret: config.fbAppSecret });
 
 var kdt = require('kdt');
-var base64 = require('node-base64-image');
 var request = require('request');
 var async = require('async');
 var _ = require('underscore');
