@@ -10,6 +10,7 @@ var kdt = require('kdt');
 var request = require('request');
 var async = require('async');
 var _ = require('underscore');
+var pixelGetter = require('pixel-getter');
 
 /* POST to trigger mosaic rendering */
 router.post('/', function (req, res, next) {
@@ -19,12 +20,29 @@ router.post('/', function (req, res, next) {
     downloadPictures(likes, function (err, imageData) {
       if (err) throw err;
       console.log("Length of imageData:", Object.keys(imageData).length);
-      // console.log(imageData);
+      // Adding to KD-tree
+      var coords = []
+      _.each(imageData, function (value, key) {
+        var point = getAverageColor(value.pixels);
+        point.name = key;
+        coords.push(point);
+      });
+      console.log("Coords length:", coords.length);
+      var distance = function (a, b) {
+        return Math.pow(a.r - b.r, 2) + Math.pow(a.g - b.g, 2) + Math.pow(a.b - b.b, 2);
+      };
+      var tree = kdt.createKdTree(coords, distance, ["r", "g", "b"]);
       // download profile picture
       downloadProfilePicture(req.body.fbid, function (err, propicImage) {
         if (err) throw err;
         // console.log(propicImage);
-        console.log("Done!");
+        pixelGetter.get(new Buffer(propicImage, 'base64'), function (err, pixels) {
+          if (err) throw err;
+          var mosaic = splitProfilePicture(pixels); // optional resolution param
+          var nearests = returnNearests(tree, mosaic);
+          console.log(nearests);
+          console.log("Done!");
+        });
       });
     });
   });
@@ -94,9 +112,21 @@ var downloadPictures = function (likes, callback) {
           return;
         }
         if (image) { // image could be null
-          ret[like] = image;
+          pixelGetter.get(new Buffer(image, 'base64'), function (err, pixels) {
+            if (err) {
+              cb(err, null);
+              return;
+            }
+            ret[like] = {
+              base64: image,
+              pixels: pixels
+            };
+            console.log("Added image info for", like);
+            cb();
+          });
+        } else {
+          cb();
         }
-        cb();
       });
     });
   }, function (err) {
@@ -122,7 +152,6 @@ var downloadProfilePicture = function (id, callback) {
         return;
       }
       if (image) {
-        console.log("Big propic");
         callback(null, image);
       } else {
         callback("image is null", null);
@@ -144,6 +173,80 @@ var encodeBase64 = function (url, callback) {
       callback(null, null);
     }
   });
+};
+
+var getAverageColor = function (pixels) {
+  var numPixels = pixels[0].length;
+  var r = 0;
+  var g = 0;
+  var b = 0;
+  for (var i = 0; i < numPixels; i++) {
+    var pixel = pixels[0][i];
+    r += pixel.r;
+    g += pixel.g;
+    b += pixel.b;
+  }
+  r /= numPixels;
+  g /= numPixels;
+  b /= numPixels;
+  return { r: r, g: g, b: b };
+};
+
+var getAverageColorOfRegion = function (pixels, xBounds, yBounds) {
+  var numPixels = (xBounds[1] - xBounds[0]) * (yBounds[1] - yBounds[0]);
+  var r = 0;
+  var g = 0;
+  var b = 0;
+  for (var x = xBounds[0]; x < xBounds[1]; x++) {
+    for (var y = yBounds[0]; y < yBounds[1]; y++) {
+      var pixel = pixels[0][y * 768 + x];
+      r += pixel.r;
+      g += pixel.g;
+      b += pixel.b;
+    }
+  }
+  r /= numPixels;
+  g /= numPixels;
+  b /= numPixels;
+  return { r: r, g: g, b: b };
+};
+
+var splitProfilePicture = function (pixels, resolution) {
+  // pixels - pixelGetter.get
+  // resolution - int (defaults to 24)
+  // Assume 768x768, divisible by 24, 32, 48, 64
+  // returns a 2d array
+  if (!resolution) resolution = 24;
+  var interval = 768 / resolution;
+  var ret = [];
+  for (var y = 0; y < resolution; y++) {
+    var row = [];
+    for (var x = 0; x < resolution; x++) {
+      console.log("Calculating x =", x, "and y =", y);
+      var xBounds = [Math.floor(x * interval), Math.floor((x+1) * interval)];
+      var yBounds = [Math.floor(y * interval), Math.floor((y+1) * interval)];
+      row.push(getAverageColorOfRegion(pixels, xBounds, yBounds));
+    }
+    ret.push(row);
+  }
+  return ret;
+};
+
+var returnNearests = function (tree, mosaic) {
+  // tree - kdtree
+  // mosaic - 2d array from splitProfilePicture
+  var ret = []
+  for (var row = 0; row < mosaic.length; row++) {
+    var rowRet = [];
+    for (var col = 0; col < mosaic[row].length; col++) {
+      console.log("Calcing nearest of row", row, "and col", col);
+      console.log(mosaic[row][col]);
+      var nearest = tree.nearest(mosaic[row][col], 1);
+      rowRet.push(nearest[0][0]);
+    }
+    ret.push(rowRet);
+  }
+  return ret;
 };
 
  module.exports = router;
