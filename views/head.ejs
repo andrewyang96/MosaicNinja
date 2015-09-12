@@ -13,10 +13,11 @@
     <link href="/components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="/components/components-font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="/components/bootstrap-social/bootstrap-social.css">
-   
+
 </head>
 <body>
 <script type="text/javascript" src="/components/jquery/dist/jquery.min.js"></script>
+
 <script>
 
 function statusChangeCallback(response) {
@@ -30,8 +31,8 @@ function statusChangeCallback(response) {
       // Logged into your app and Facebook.
       authData = response.authResponse;
       console.log(authData);
-      $('#mosaicgenerator').show();
       
+
       testAPI();
     } else if (response.status === 'not_authorized') {
       // The person is logged into Facebook, but not your app.
@@ -63,19 +64,21 @@ function statusChangeCallback(response) {
     console.log('Welcome!  Fetching your information.... ');
     FB.api('/me', function(response) {
       console.log('Successful login for: ' + response.name);
+
       document.getElementById('status').innerHTML =
-        'Thanks for logging in, ' + response.name + '!';
+        '';
     });
 
   }
 window.fbAsyncInit = function() {
+
     FB.init({
       appId      : '1580113125600195',
       cookie     : true, 
       xfbml      : true,
       version    : 'v2.4'
     });
-    checkLoginState();
+     checkLoginState();
   };
   (function(d, s, id){
      var js, fjs = d.getElementsByTagName(s)[0];
@@ -86,7 +89,10 @@ window.fbAsyncInit = function() {
    }(document, 'script', 'facebook-jssdk'));
 
     
+
 </script>
+
+
 
 
 
