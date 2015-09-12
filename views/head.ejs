@@ -11,23 +11,27 @@
    
     <!-- Bootstrap core CSS -->
     <link href="/components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/components/components-font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/components/bootstrap-social/bootstrap-social.css">
    
 </head>
 <body>
 <script type="text/javascript" src="/components/jquery/dist/jquery.min.js"></script>
 <script>
-    function statusChangeCallback(response) {
+
+function statusChangeCallback(response) {
     console.log('statusChangeCallback');
     console.log(response);
     // The response object is returned with a status field that lets the
     // app know the current login status of the person.
     // Full docs on the response object can be found in the documentation
     // for FB.getLoginStatus().
-    
     if (response.status === 'connected') {
       // Logged into your app and Facebook.
       authData = response.authResponse;
       console.log(authData);
+      $('#mosaicgenerator').show();
+      
       testAPI();
     } else if (response.status === 'not_authorized') {
       // The person is logged into Facebook, but not your app.
@@ -36,16 +40,12 @@
     } else {
       // The person is not logged into Facebook, so we're not sure if
       // they are logged into this app or not.
+
       document.getElementById('status').innerHTML = 'Please log ' +
         'into Facebook.';
     }
   }
-  function logout(){
-    FB.logout(function(response) {
-        // Person is now logged out
-    });
-  }
-
+  
   // This function is called when someone finishes with the Login
   // Button.  See the onlogin handler attached to it in the sample
   // code below.
@@ -55,24 +55,9 @@
       statusChangeCallback(response);
     });
   }
-
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '1580113125600195',
-      xfbml      : true,
-      version    : 'v2.4'
-    });
-  };
   
-
  
-  (function(d, s, id){
-     var js, fjs = d.getElementsByTagName(s)[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement(s); js.id = id;
-     js.src = "//connect.facebook.net/en_US/sdk.js";
-     fjs.parentNode.insertBefore(js, fjs);
-   }(document, 'script', 'facebook-jssdk'));
+  
 
   function testAPI() {
     console.log('Welcome!  Fetching your information.... ');
@@ -83,6 +68,24 @@
     });
 
   }
+window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1580113125600195',
+      cookie     : true, 
+      xfbml      : true,
+      version    : 'v2.4'
+    });
+    checkLoginState();
+  };
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+
+    
 </script>
 
 
@@ -98,26 +101,17 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">Brand</a>
+      <a class="navbar-brand" href="#">MosaicNinja</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse navbar-right" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
-        <li><a href="#">Link</a></li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="#">Separated link</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="#">One more separated link</a></li>
-          </ul>
-        </li>
+        <li class="active"><a href="#">About <span class="sr-only">(current)</span></a></li>
+        
+        
+            
+          
       </ul>
       
       

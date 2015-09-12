@@ -9,10 +9,10 @@
 
 	<ul>
 	
-	<li class="dropdown text-center">
+	<li class="dropdown ">
 		You are what you
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-          <ul class="dropdown-menu">
+          <ul class="dropdown-menu ">
             <li><a href="#">LIKE</a></li>
             <li><a href="#">EAT</a></li>
             <li><a href="#">EXPERIENCE</a></li>
@@ -22,14 +22,24 @@
     </ul>
 
 	<div id="status">
-		<fb:login-button scope="public_profile,email" onlogin="checkLoginState();" class="text-center">
-		</fb:login-button>
-	</div>
-		<div id='mosaicgenerator'type="button"class="btn btn-default">
-		Mosaic Generator
-		</div>
+		<div class="row">
+  			<div class="col-xs-6 col-md-4">
+  			<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+</fb:login-button>
+			</div>
 
-	  	<p class="text-center">message</p>
+			
+		</div>
+	</div>
+	
+	<div id='mosaicgenerator'type="button"class="btn btn-default">
+			Mosaic Generator
+	</div>
+
+
+
+	  	<p class="">message</p>
+
 
 </div>
 <% include footer.ejs %>
