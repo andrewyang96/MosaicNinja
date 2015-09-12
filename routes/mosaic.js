@@ -4,7 +4,7 @@ var router = express.Router();
 var config = require('../config');
 var request = require('request');
 var Facebook = require('facebook-node-sdk');
-var facebook = new Facebook({ appID: config.fbAppID, secret: config.fbAppSecret });
+var facebook = new Facebook({ appId: config.fbAppID, secret: config.fbAppSecret });
 
 var kdt = require('kdt');
 var base64 = require('node-base64-image');
@@ -33,25 +33,27 @@ router.post('/', function (req, res, next) {
 
 var getLikes = function (id, callback) {
   facebook.api('/' + id + '/likes?limit=100', function (err, data) {
-    if (err) throw err;
-    extractLikes(data, function (err, likes) {
-      if (err) throw err;
+    if (err) callback(err, null);
+    console.log("Calling first 100");
+    extractLikes(data, id, function (err, likes) {
+      if (err) callback(err, null);
       callback(null, likes);
     });
   });
 };
 
-var extractLikes = function (likes, callback) {
+var extractLikes = function (likes, id, callback) {
   // Helper function
   var likesObj = likes.data || [];
   var ret = [];
   for (var i = 0; i < likesObj.length; i++) {
     ret.push(likesObj[i].id);
   }
-  if (likes.paging.cursors.after) { // recursive case
+  if (likes.paging && likes.paging.cursors && likes.paging.cursors.after) { // recursive case
+    console.log("Calling next 100");
     facebook.api('/' + id + '/likes?limit=100&after=' + likes.paging.cursors.after, function (err, data) {
       if (err) callback(err, null);
-      extractLikes(data, function (err, more) {
+      extractLikes(data, id, function (err, more) {
         if (err) callback(err, null);
         callback(null, ret.concat(more));
       });
@@ -64,25 +66,27 @@ var extractLikes = function (likes, callback) {
 var downloadPictures = function (likes, callback) {
   // likes - array of ids
   // returns map of id keys and base 64 object values
-  async.map(likes, function (like) {
-    facebook.api('/' + like.id + '/picture?width=50&height=50', function (err, likeObj) {
-      if (err) throw err;
+  async.map(likes, function (like, cb) {
+    facebook.api('/' + like + '?fields=picture&width=50&height=50', function (err, likeObj) {
+      if (err) cb(err, null);
       // encode image to base64
-      base64.base64encode(likeObj.data.url, { string: true }, function (err, saved) {
-        if (err) throw err;
-        return saved;
+      base64.base64encoder(likeObj.picture.data.url, { string: true }, function (err, image) {
+        if (err) cb(err, null);
+        console.log("Processed image");
+        cb(null, image);
       });
     });
   }, function (err, results) {
+    console.log(err);
     if (err) callback(err, null);
     // zip the likes and results arrays
     var retObj = _.object(likes, results);
-    callback(null, results);
+    callback(null, retObj);
   });
 };
 
 var downloadProfilePicture = function (id, callback) {
-  facebook.api('/' + req.body.fbid + '/picture?width=9999&height=9999', function (err, propicData) {
+  facebook.api('/' + id + '/picture?width=9999&height=9999', function (err, propicData) {
     if (err) callback(err, null);
     base64.base64encode(propicData.data.url, { string: true}, function (err, saved) {
       if (err) callback(err, null);
