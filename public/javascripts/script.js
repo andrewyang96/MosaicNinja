@@ -19,10 +19,15 @@ $(document).ready(function(){
 
       $(".btn:first-child").text($(this).text());
       $(".btn:first-child").val($(this).text());
-
+      $(".message").text()=$(this).text();
    });
+	$("#mosaicgenerator").click(function(){
+		$(".progress").show();
+		$("#mosaicgenerator").hide();
+	});
   
   $('#mosaicgenerator').hide();
+  $('.progress').hide();
 
 });
 

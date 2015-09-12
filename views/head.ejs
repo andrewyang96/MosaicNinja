@@ -13,7 +13,7 @@
     <link href="/components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="/components/components-font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="/components/bootstrap-social/bootstrap-social.css">
-   
+
 </head>
 <body>
 <script type="text/javascript" src="/components/jquery/dist/jquery.min.js"></script>
@@ -31,7 +31,7 @@ function statusChangeCallback(response) {
       authData = response.authResponse;
       console.log(authData);
       $('#mosaicgenerator').show();
-      
+
       testAPI();
     } else if (response.status === 'not_authorized') {
       // The person is logged into Facebook, but not your app.
@@ -86,7 +86,10 @@ window.fbAsyncInit = function() {
    }(document, 'script', 'facebook-jssdk'));
 
     
+
 </script>
+
+
 
 
 
