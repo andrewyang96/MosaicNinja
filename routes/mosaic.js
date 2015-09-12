@@ -12,7 +12,8 @@ var async = require('async');
 var _ = require('underscore');
 
 /* POST to trigger mosaic rendering */
-router.post('/mosaic', function (req, res, next) {
+router.post('/', function (req, res, next) {
+  res.send({ "socket": "/mosaic/" + req.body.fbid });
   getLikes(req.body.fbid, function (err, likes) {
     if (err) throw err;
     downloadPictures(likes, function (err, imageData) {
