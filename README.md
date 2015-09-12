@@ -1,0 +1,2 @@
+# MosaicNinja
+For MHacks VI.
