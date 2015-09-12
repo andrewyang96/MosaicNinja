@@ -16,12 +16,19 @@
 
 </head>
 <body>
-<script type="text/javascript" src="/components/jquery/dist/jquery.min.js"></script>
+
 
 <script type="text/javascript">
       
+ window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1580113125600195',
+      xfbml      : true,
+      version    : 'v2.4'
+    });
+  };
   // Initialize the Facebook JavaScript SDK
-  window.fbAsyncInit = function() {
+  /*window.fbAsyncInit = function() {
   FB.init({
     appId: '1580113125600195',
     xfbml: true,
@@ -29,8 +36,9 @@
     cookie: true,
     version: 'v2.4'
   });
-  FB.getLoginStatus(checkLoginStatus);
+  //FB.getLoginStatus(checkLoginStatus);
   };
+  */
   (function(d, s, id){
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) {return;}
@@ -38,8 +46,10 @@
   js.src = "//connect.facebook.net/en_US/sdk.js";
   fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));
+</script>
+<script>
   // Check if the current user is logged in and has authorized the app
-  FB.getLoginStatus(checkLoginStatus);
+  
 
   // Login in the current user via Facebook and ask for email permission
   function authUser() {
@@ -48,9 +58,49 @@
 
   // Check the result of the user status and display login button if necessary
   function checkLoginStatus(response) {
-    if(response && response.status == 'connected') {
+    if(response.status == 'connected') {
+      console.log(response.status);
       authData = response.authResponse;
+      var ref = new Firebase("https://facebookmosaic.firebaseio.com/");
+      var mosaicsref= ref.child("mosaics").child(authData.userID);
       
+    mosaicsref.on('child_changed',function(childSnapshot,prevChildKey){
+      mosaicsref.once('value',function(dataSnapshot){
+          
+          var source = dataSnapshot.val();
+          console.log(source);
+          //example
+          var canvas = document.getElementById('new_canvas');
+          var context = canvas.getContext('2d');
+          var imageObj = new Image();
+
+          imageObj.onload = function() {
+            context.drawImage(imageObj, 69, 50);
+          };
+          imageObj.src = 'http://www.html5canvastutorials.com/demos/assets/darth-vader.jpg';
+          //actual
+          for(var row=0; row< source.length; row++){
+            for(var col=0;col<source[row].length;col++){
+              
+               var ctx = document.getElementById('new_canvas').getContext('2d');
+                var pixel = source[row][col];
+                var img = new Image();
+                img.src = "http://www.html5canvastutorials.com/demos/assets/darth-vader.jpg";
+                //"data:image/jpeg;base64,"+pixel;
+                img.onload = function (){
+                    ctx.drawImage(img,row*50,col*50);
+                  }
+            }
+          
+          }
+        },
+        function(err){
+          console.log(err);
+        });
+      
+      }
+    );
+
       // Hide the login button
       document.getElementById('loginButton').style.display = 'none';
       
@@ -63,7 +113,9 @@
       document.getElementById('loginButton').style.display = 'block';
     }
   }
+
 </script>
+<script type="text/javascript" src="/components/firebase/firebase.js"></script>
     
 
 
