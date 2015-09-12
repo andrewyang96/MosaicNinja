@@ -23,6 +23,7 @@ router.post('/', function (req, res, next) {
       var coords = []
       _.each(imageData, function (value, key) {
         var point = getAverageColor(value.pixels);
+        point.b64 = value.base64;
         point.name = key;
         coords.push(point);
       });
@@ -38,6 +39,7 @@ router.post('/', function (req, res, next) {
           var mosaic = splitProfilePicture(pixels); // optional resolution param
           var nearests = returnNearests(tree, mosaic);
           console.log(nearests);
+          // DONE! TODO: persist nearests 2d array to somewhere
         });
       });
     });
