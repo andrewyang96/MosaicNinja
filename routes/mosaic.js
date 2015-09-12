@@ -18,7 +18,12 @@ router.post('/mosaic', function (req, res, next) {
     downloadPictures(likes, function (err, imageURLs) {
       if (err) throw err;
       console.log(imageURLs);
-      res.send('Mosaic making with theme ' + req.body.theme + ' started for ID ' + req.body.fbid);
+      // download profile picture
+      downloadProfilePicture(req.body.fbid, function (err, propicImage) {
+        if (err) throw err;
+        console.log(propicImage);
+        res.send('Mosaic making with theme ' + req.body.theme + ' started for ID ' + req.body.fbid);
+      });
     });
   });
 });
@@ -72,6 +77,16 @@ var downloadPictures = function (likes, callback) {
     // zip the likes and results arrays
     var retObj = _.object(likes, results);
     callback(null, results);
+  });
+};
+
+var downloadProfilePicture = function (id, callback) {
+  facebook.api('/' + req.body.fbid + '/picture?width=9999&height=9999', function (err, propicData) {
+    if (err) callback(err, null);
+    base64.base64encode(propicData.data.url, { string: true}, function (err, saved) {
+      if (err) callback(err, null);
+      callback(null, saved);
+    });
   });
 };
 
