@@ -23,10 +23,11 @@
     // app know the current login status of the person.
     // Full docs on the response object can be found in the documentation
     // for FB.getLoginStatus().
+    
     if (response.status === 'connected') {
       // Logged into your app and Facebook.
-      
-      document.getElementById('status').innerHTML='<div class="btn text-center">test<div>';
+      authData = response.authResponse;
+      console.log(authData);
       testAPI();
     } else if (response.status === 'not_authorized') {
       // The person is logged into Facebook, but not your app.
@@ -80,6 +81,7 @@
       document.getElementById('status').innerHTML =
         'Thanks for logging in, ' + response.name + '!';
     });
+
   }
 </script>
 
