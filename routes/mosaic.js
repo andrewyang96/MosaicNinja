@@ -63,7 +63,7 @@ router.post('/', function (req, res, next) {
   });
 });
 
-/* Begin mosaic making methods */
+/* Begin Facebook mosaic making methods */
 
 var getLikes = function (id, callback) {
   facebook.api('/' + id + '/likes?limit=100', function (err, data) {
@@ -172,6 +172,53 @@ var downloadProfilePicture = function (id, callback) {
     });
   });
 };
+
+/* Begin Expedia mosaic methods */
+
+var getCityPhotos = function (city, callback) {
+  // Pull image URLs from Expedia's Activities API
+  request({
+    url: "http://terminal2.expedia.com/x/activities/search?location=" + city + "&apikey=" + config.expediaKey,
+    headers: {
+      'User-Agent': 'request'
+    }
+  }, function (err, res, body) {
+    if (err) throw err;
+    if (body && res.statusCode === 200) {
+      var j = JSON.parse(body);
+      var ret = [];
+      for (var i = 0; i < j.activities.length; i++) {
+        ret.push(j.activities[i].imageUrl);
+      }
+      callback(null, ret);
+    } else {
+      callback(null, null);
+    }
+  });
+};
+
+var getCities = function (cities, callback) {
+  // cities - array of 2 to 5 cities
+  var ret = {};
+  async.each(cities, function (city, cb) {
+    getCityPhotos(city, function (err, images) {
+      if (err) {
+        cb(err, null);
+        return;
+      }
+      ret[city] = images;
+      cb();
+    });
+  }, function (err) {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    callback(null, ret);
+  });
+};
+
+/* Begin general mosaic methods */
 
 var encodeBase64 = function (url, callback) {
   request({url: url, encoding: null}, function (err, res, body) {
