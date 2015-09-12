@@ -1,3 +1,6 @@
+
+  
+
 $('#mosaicgenerator').click(function(){
 	$.ajax({
 		url: '/mosaic',
@@ -9,5 +12,12 @@ $('#mosaicgenerator').click(function(){
 		}
 
 	})
+});
+
+$(document).ready(function(){
+	
+  
+  $('#mosaicgenerator').hide();
+
 });
 
