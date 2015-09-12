@@ -50,6 +50,7 @@ router.post('/', function (req, res, next) {
             if (err) throw err;
             var mosaic = splitProfilePicture(pixels); // optional resolution param
             var nearests = returnNearests(tree, mosaic);
+            nearests.lastUpdated = Firebase.ServerValue.TIMESTAMP; // guarantee trigger child_changed
             mosaicsRef.child(req.body.fbid).set(nearests, function (error) {
               if (error) {
                 console.log("Error storing mosaic for user", req.body.fbid);
