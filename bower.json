@@ -1,0 +1,16 @@
+{
+  "name": "MosaicNinja",
+  "version": "0.0.0",
+  "homepage": "https://github.com/andrewyang96/MosaicNinja",
+  "authors": [
+    "Andrew Yang <ayang14@illinois.edu>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
