@@ -19,7 +19,6 @@ router.post('/', function (req, res, next) {
     if (err) throw err;
     downloadPictures(likes, function (err, imageData) {
       if (err) throw err;
-      console.log("Length of imageData:", Object.keys(imageData).length);
       // Adding to KD-tree
       var coords = []
       _.each(imageData, function (value, key) {
@@ -27,7 +26,6 @@ router.post('/', function (req, res, next) {
         point.name = key;
         coords.push(point);
       });
-      console.log("Coords length:", coords.length);
       var distance = function (a, b) {
         return Math.pow(a.r - b.r, 2) + Math.pow(a.g - b.g, 2) + Math.pow(a.b - b.b, 2);
       };
@@ -35,13 +33,11 @@ router.post('/', function (req, res, next) {
       // download profile picture
       downloadProfilePicture(req.body.fbid, function (err, propicImage) {
         if (err) throw err;
-        // console.log(propicImage);
         pixelGetter.get(new Buffer(propicImage, 'base64'), function (err, pixels) {
           if (err) throw err;
           var mosaic = splitProfilePicture(pixels); // optional resolution param
           var nearests = returnNearests(tree, mosaic);
           console.log(nearests);
-          console.log("Done!");
         });
       });
     });
@@ -134,7 +130,6 @@ var downloadPictures = function (likes, callback) {
       callback(err, null);
       return;
     }
-    console.log("Returning thumbnails");
     callback(null, ret);
   });
 };
@@ -142,7 +137,6 @@ var downloadPictures = function (likes, callback) {
 var downloadProfilePicture = function (id, callback) {
   facebook.api('/' + id + '/picture?redirect=false&width=9999&height=9999', function (err, propicData) {
     if (err) {
-      console.log("Error!");
       callback(err, null);
       return;
     }
@@ -240,7 +234,6 @@ var returnNearests = function (tree, mosaic) {
     var rowRet = [];
     for (var col = 0; col < mosaic[row].length; col++) {
       console.log("Calcing nearest of row", row, "and col", col);
-      console.log(mosaic[row][col]);
       var nearest = tree.nearest(mosaic[row][col], 1);
       rowRet.push(nearest[0][0]);
     }
