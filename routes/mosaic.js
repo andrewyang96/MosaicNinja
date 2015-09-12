@@ -14,8 +14,12 @@ var _ = require('underscore');
 /* POST to trigger mosaic rendering */
 router.post('/mosaic', function (req, res, next) {
   getLikes(req.body.fbid, function (err, likes) {
-    console.log(likes);
-    res.send('Mosaic making with theme ' + req.body.theme + ' started for ID ' + req.body.fbid);
+    if (err) throw err;
+    downloadPictures(likes, function (err, imageURLs) {
+      if (err) throw err;
+      console.log(imageURLs);
+      res.send('Mosaic making with theme ' + req.body.theme + ' started for ID ' + req.body.fbid);
+    });
   });
 });
 
@@ -32,6 +36,7 @@ var getLikes = function (id, callback) {
 };
 
 var extractLikes = function (likes, callback) {
+  // Helper function
   var likesObj = likes.data || [];
   var ret = [];
   for (var i = 0; i < likesObj.length; i++) {
