@@ -14,7 +14,8 @@
    
 </head>
 <body>
-<script src="https://ajax.googleapis.com/ajax/libs /jquery/1.7.2/jquery.min.js">
+<script type="text/javascript" src="/components/jquery/dist/jquery.min.js"></script>
+<script>
     function statusChangeCallback(response) {
     console.log('statusChangeCallback');
     console.log(response);
@@ -24,8 +25,8 @@
     // for FB.getLoginStatus().
     if (response.status === 'connected') {
       // Logged into your app and Facebook.
-      $('status').hide();
-      //document.getElementById('status').innerHTML='<div class="btn text-center">test<div>';
+      
+      document.getElementById('status').innerHTML='<div class="btn text-center">test<div>';
       testAPI();
     } else if (response.status === 'not_authorized') {
       // The person is logged into Facebook, but not your app.
@@ -49,6 +50,7 @@
   // code below.
   function checkLoginState() {
     FB.getLoginStatus(function(response) {
+      console.log("test");
       statusChangeCallback(response);
     });
   }
@@ -70,6 +72,15 @@
      js.src = "//connect.facebook.net/en_US/sdk.js";
      fjs.parentNode.insertBefore(js, fjs);
    }(document, 'script', 'facebook-jssdk'));
+
+  function testAPI() {
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+      document.getElementById('status').innerHTML =
+        'Thanks for logging in, ' + response.name + '!';
+    });
+  }
 </script>
 
 
