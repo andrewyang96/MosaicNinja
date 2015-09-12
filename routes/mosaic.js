@@ -6,6 +6,16 @@ var request = require('request');
 var Facebook = require('facebook-node-sdk');
 var facebook = new Facebook({ appId: config.fbAppID, secret: config.fbAppSecret });
 
+var Firebase = require('firebase');
+var ref = new Firebase("https://facebookmosaic.firebaseio.com/");
+ref.authWithCustomToken(config.firebaseSecret, function (error, authData) {
+  if (error) {
+    console.log("Firebase secret auth failed!");
+    throw error;
+  }
+});
+var mosaicsRef = ref.child("mosaics");
+
 var kdt = require('kdt');
 var request = require('request');
 var async = require('async');
@@ -38,7 +48,11 @@ router.post('/', function (req, res, next) {
           if (err) throw err;
           var mosaic = splitProfilePicture(pixels); // optional resolution param
           var nearests = returnNearests(tree, mosaic);
-          console.log(nearests);
+          mosaicsRef.child(req.body.fbid).set(to2DFirebaseArray(nearests), function (error) {
+            if (error) {
+              console.log("Error storing mosaic for user", req.body.fbid);
+            }
+          });
           // DONE! TODO: persist nearests 2d array to somewhere
         });
       });
@@ -243,5 +257,18 @@ var returnNearests = function (tree, mosaic) {
   }
   return ret;
 };
+
+var to2DFirebaseArray = function (arr) {
+  // add keys
+  var ret = {};
+  for (var row = 0; row < arr.length; row++) {
+    var rowRet = {};
+    for (var col = 0; col < arr[row].length; arr++) {
+      rowRet[col] = arr[row][col];
+    }
+    ret[row] = rowRet;
+  }
+  return ret;
+}
 
  module.exports = router;
