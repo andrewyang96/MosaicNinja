@@ -3,4 +3,6 @@ var config = {};
 config.fbAppID = "";
 config.fbAppSecret = "";
 
+config.firebaseSecret = "";
+
 module.exports = config;
