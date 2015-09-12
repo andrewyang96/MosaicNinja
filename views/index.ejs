@@ -1,11 +1,30 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
-</html>
+<% include head.ejs %>
+<div class="container">
+	<div class="page-header">
+		<h1> Welcome </h1>
+	</div>
+	<div class="lead">
+	MosaicNinja is ...
+	</div>
+
+	<ul>
+	
+	<li class="dropdown text-center">
+		You are what you
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">LIKE</a></li>
+            <li><a href="#">EAT</a></li>
+            <li><a href="#">EXPERIENCE</a></li>
+            
+          </ul>
+    </li>
+    </ul>
+</div>
+
+	<fb:login-button scope="public_profile,email" onlogin="checkLoginState();" class="text-center">
+</fb:login-button>
+  	<p class="text-center">message</p>
+
+
+<% include footer.ejs %>
