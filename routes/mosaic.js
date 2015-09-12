@@ -15,9 +15,9 @@ var _ = require('underscore');
 router.post('/mosaic', function (req, res, next) {
   getLikes(req.body.fbid, function (err, likes) {
     if (err) throw err;
-    downloadPictures(likes, function (err, imageURLs) {
+    downloadPictures(likes, function (err, imageData) {
       if (err) throw err;
-      console.log(imageURLs);
+      console.log(imageData);
       // download profile picture
       downloadProfilePicture(req.body.fbid, function (err, propicImage) {
         if (err) throw err;
