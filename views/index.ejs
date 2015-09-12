@@ -20,11 +20,16 @@
           </ul>
     </li>
     </ul>
+
+	<div id="status">
+		<fb:login-button scope="public_profile,email" onlogin="checkLoginState();" class="text-center">
+		</fb:login-button>
+	</div>
+		<div id='mosaicgenerator'type="button"class="btn btn-default">
+		Mosaic Generator
+		</div>
+
+	  	<p class="text-center">message</p>
+
 </div>
-
-	<fb:login-button scope="public_profile,email" onlogin="checkLoginState();" class="text-center">
-</fb:login-button>
-  	<p class="text-center">message</p>
-
-
 <% include footer.ejs %>
