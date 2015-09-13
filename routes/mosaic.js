@@ -85,21 +85,9 @@ router.post('/', function (req, res, next) {
     console.log("Making Expedia mosaic");
     getCities(req.body["cities[]"], function (err, images) {
       if (err) throw err;
-      downloadCities(images, function (err, citiesImages) {
+      downloadCities(images, function (err, coords) {
         if (err) throw err;
         // construct KD-tree
-        var coords = [];
-        console.log(citiesImages);
-        for (var i = 0; i < citiesImages.length; i++) {
-          var point = citiesImages[i];
-          point.r = point.avgColor.r;
-          point.g = point.avgColor.g;
-          point.b = point.avgColor.b;
-          delete point.avgColor;
-          coords.push(point);
-        }
-        console.log("Coords");
-        console.log(coords);
         var tree = kdt.createKdTree(coords, distance, ["r", "g", "b"]);
         // download profile picture
         downloadProfilePicture(req.body.fbid, function (err, propicImage, size) {
@@ -297,23 +285,25 @@ var downloadCities = function (cities, callback) {
   async.each(inputImages, function (url, cb) {
     console.log("Finding image at URL", url);
     cropPicture("http:" + url, function (err, buf, b64) {
-      if (err) {
-        cb(err, null);
-        return;
-      }
-      pixelGetter.get(buf, function (err, pixels) {
-        if (err) {
-          cb(err, null);
-          return;
-        }
-        var avgColor = getAverageColor(pixels);
-        console.log("Pushing city image:", url);
-        ret.push({
-          avgColor: pixels,
-          b64: b64
-        });
+      if (err) { // in case of unsupported MIME type
+        console.log(err);
         cb();
-      });
+        // cb(err, null);
+        // return;
+      } else {
+        pixelGetter.get(buf, function (err, pixels) {
+          if (err) {
+            cb(err, null);
+            return;
+          }
+          var imageObj = getAverageColor(pixels);
+          imageObj.b64 = b64.bitmap.data.toString('base64');
+          imageObj.name = null;
+          console.log("Pushing city image:", url);
+          ret.push(imageObj);
+          cb();
+        });
+      }
     });
   }, function (err) {
     if (err) {
@@ -329,7 +319,6 @@ var downloadCities = function (cities, callback) {
 var cropPicture = function (url, callback) {
   // crop pictures from 350x197
   // returns buffer and base64
-  console.log(url);
   encodeBase64(url, function (err, image) {
     if (err) {
       callback(err, null);
