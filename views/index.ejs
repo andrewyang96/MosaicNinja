@@ -2,51 +2,70 @@
 
 
 <div class="container">
-	<div class="page-header">
-		<h1> Welcome </h1>
-	</div>
-	<div class="lead">
-	MosaicNinja is ...
+	<div class="page-header text-center">
+		<h1> Welcome to MosaicNinja</h1>
 	</div>
 
-	<div class="btn-group">
+	<div class="text-center">
+		<img src="http://images.cpcache.com/image/6583719.png" style="height:178px;width:180px;" />
 
-	    <button class="btn">You are what you</button>
-	    <button class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-	    <span class="caret"></span>
-	   </button>
-	 <ul class="dropdown-menu" class="list-unstyled" role="menu" aria-labelledby="dropdownMenu">
-
-	   <li><a tabindex="1" href="#">You are what you Like</a></li>
-	   <li><a tabindex="2" href="#">You are what you Eat</a></li>
-	   <li><a tabindex="3" href="#">You are what you Experience</a></li>
-	   
-	 </ul>
+		<br>
+		<br>
+		<div class="col-md-4"></div>
+		<div class="col-md-4">
+					<a id="loginButton" class="btn btn-block btn-lg btn-social btn-facebook"type="button"  onclick="authUser();"><i class="fa fa-facebook"></i> Sign in with Facebook</a>
+		</div>
+		<div class="col-md-4"></div>
 	</div>
 	
 	
-	<br>
-	<br>
-	 <input id="loginButton" type="button" value="Login!" onclick="authUser();" />
-	
-	
-	<br>
+	  	
+			<div class="progress">
 
-	<div id='mosaicgenerator'type="button"class="btn btn-default">
-			Mosaic Generator
-	</div>
+			  	<div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+			    60%
+			  	</div>
 
-	<br>
-	<br>
+		  	</div>
+		  	<p class="message"></p>
+	  	
 
-	<div class="progress">
-  	<div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
-    60%
-  	</div>
+		  	<div class="col-md-4"></div>
+		  	
+			<div class="btn-group col-md-4">
+
+		    <button class="btn btn-lg">You are what you</button>
+		    <button class="btn btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		    <span class="caret"></span>
+		   </button>
+	 		<ul class="dropdown-menu" class="list-unstyled" role="menu" aria-labelledby="dropdownMenu">
+
+		   <li><a tabindex="1" href="#">You are what you Like</a></li>
+		   <li><a tabindex="2" href="#">You are what you Eat</a></li>
+		   <li><a tabindex="3" href="#">You are what you Experience</a></li>
+		   
+		 	</ul>
+			</div>
+			<div class="col-md-4"></div>
+			<br>
+
+			
+				
+				<br>
+				<br>
+				<div class="col-md-4"></div>
+				<div class="col-md-4">
+					<div id='mosaicgenerator' type="button"class="btn btn-default">
+							Generate Mosaic
+					</div>
+				</div>
+				<div class="col-md-4"></div>
+	  	
+
 </div>
 
 
-	<p class="message"></p>
+	
 
 <br>
 <canvas id="new_canvas" style="width:1200px; height: 1200px">

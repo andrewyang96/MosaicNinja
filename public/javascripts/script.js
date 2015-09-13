@@ -16,6 +16,11 @@ $('#mosaicgenerator').click(function(){
 
 
 $(document).ready(function(){
+	$('#mosaicgenerator').hide();
+  	$('.progress').hide();
+  	$('.message').hide();
+  	$('.btn-group').hide();
+	
 	$(".dropdown-menu li a").click(function(){
 
       $(".btn:first-child").text($(this).text());
@@ -26,15 +31,14 @@ $(document).ready(function(){
       $(".message").text($(this).text()+" is being generated!");
    });
 	$("#mosaicgenerator").click(function(){
+		$('#about').hide();
 		$(".progress").show();
 		$('.message').show();
 		$("#mosaicgenerator").hide();
 		$(".btn-group").hide();
 	});
   
-  $('#mosaicgenerator').hide();
-  $('.progress').hide();
-  $('.message').hide();
+  
 
 });
 

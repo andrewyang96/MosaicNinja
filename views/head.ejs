@@ -61,6 +61,7 @@
     if(response.status == 'connected') {
       console.log(response.status);
       authData = response.authResponse;
+      $('.btn-group').show();
       var ref = new Firebase("https://facebookmosaic.firebaseio.com/");
       var mosaicsref= ref.child("mosaics").child(authData.userID);
       
@@ -70,6 +71,7 @@
           var source = dataSnapshot.val();
           console.log(source);
           //example
+          /*
           var canvas = document.getElementById('new_canvas');
           var context = canvas.getContext('2d');
           var imageObj = new Image();
@@ -79,19 +81,20 @@
           };
           imageObj.src = 'http://www.html5canvastutorials.com/demos/assets/darth-vader.jpg';
           //actual
+          */
           for(var row=0; row< source.length; row++){
             for(var col=0;col<source[row].length;col++){
-              
+
                var ctx = document.getElementById('new_canvas').getContext('2d');
                 var pixel = source[row][col];
                 var img = new Image();
-                img.src = "http://www.html5canvastutorials.com/demos/assets/darth-vader.jpg";
+              
                 //"data:image/jpeg;base64,"+pixel;
                 img.onload = function (){
                     ctx.drawImage(img,row*50,col*50);
                   }
+                img.src = "http://www.html5canvastutorials.com/demos/assets/darth-vader.jpg";
             }
-          
           }
         },
         function(err){
