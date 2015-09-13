@@ -362,9 +362,9 @@ var cropPicture = function (url, callback) {
 /* Begin general mosaic methods */
 
 var encodeBase64 = function (url, callback) {
-  console.log("URLLLLLL", url)
   request({
     url: url,
+    encoding: null,
     headers: {
       'User-Agent': 'request'
     }
@@ -374,12 +374,10 @@ var encodeBase64 = function (url, callback) {
       return;
     }
     if (body && res.statusCode === 200) {
-      console.log("Successful request");
       var image = body.toString('base64');
       callback(null, image);
     } else {
-      console.log(url, res.statusCode);
-      console.log(body.length);
+      console.log("Request error:", res.statusCode);
       callback(null, null);
     }
   });
