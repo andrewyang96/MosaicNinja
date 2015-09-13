@@ -62,11 +62,16 @@
   function checkLoginStatus(response) {
     if(response.status == 'connected') {
       authData = response.authResponse;
-      console.log(authData);
+
+      $('.btn-group').show();
+
+     
+
       var ref = new Firebase("https://facebookmosaic.firebaseio.com/");
       var mosaicsref = ref.child("mosaics").child(authData.userID);
       
       console.log("Loading firebase", authData.userID);
+
       mosaicsref.on('child_changed', function (childSnapshot) {
         if (childSnapshot.key() === "lastUpdated") { // control
           console.log("Last updated child_changed triggered");
