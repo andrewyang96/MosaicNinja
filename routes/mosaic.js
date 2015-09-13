@@ -97,7 +97,7 @@ router.post('/', function (req, res, next) {
             var mosaic = splitProfilePicture(pixels, size);
             var nearests = returnNearests(tree, mosaic);
             nearests.lastUpdated = Firebase.ServerValue.TIMESTAMP;
-            mosaicsRef.child(req.body.fbid).set(nearests, function (error) {
+            mosaicsRef.child(req.body.fbid).set(nearests, function (error) { // DOESN'T WORK???
               if (error) {
                 console.log("Error storing mosaic for user", req.body.fbid);
               } else {
