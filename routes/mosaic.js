@@ -277,7 +277,7 @@ var getAverageColor = function (pixels) {
   r /= numPixels;
   g /= numPixels;
   b /= numPixels;
-  return { r: Math.floor(r), g: Math.floor(g), b: Math.floor(b) };
+  return { r: r, g: g, b: b };
 };
 
 var getAverageColorOfRegion = function (pixels, width, xBounds, yBounds) {
@@ -300,7 +300,7 @@ var getAverageColorOfRegion = function (pixels, width, xBounds, yBounds) {
   r /= numPixels;
   g /= numPixels;
   b /= numPixels;
-  return { r: Math.floor(r), g: Math.floor(g), b: Math.floor(b) };
+  return { r: r, g: g, b: b };
 };
 
 var splitProfilePicture = function (pixels, size, resolution) {
