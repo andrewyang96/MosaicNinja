@@ -342,11 +342,13 @@ var cropPicture = function (url, callback) {
     var buf = new Buffer(image, 'base64');
     var image = new Jimp(buf, function (err, image) {
       if (err) {
+        console.log("Error in cropping");
         callback(err, null);
         return;
       }
       // crop then resize down to 50x50
-      this.crop(76, 0, 197, 197).resize(50, 50).getBuffer(Jimp.MIME_JPEG, function (err, buffer) {
+      image.crop(76, 0, 197, 197).resize(50, 50);
+      image.getBuffer(Jimp.MIME_JPEG, function (err, buffer) {
         if (err) {
           callback(err, null);
           return;
@@ -361,12 +363,18 @@ var cropPicture = function (url, callback) {
 
 var encodeBase64 = function (url, callback) {
   console.log("URLLLLLL", url)
-  request(url, function (err, res, body) {
+  request({
+    url: url,
+    headers: {
+      'User-Agent': 'request'
+    }
+  }, function (err, res, body) {
     if (err) {
       callback(err, null);
       return;
     }
     if (body && res.statusCode === 200) {
+      console.log("Successful request");
       var image = body.toString('base64');
       callback(null, image);
     } else {
