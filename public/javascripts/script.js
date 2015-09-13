@@ -1,7 +1,8 @@
 
   
 
-$('#mosaicgenerator').click(function(){
+$('#mosaicform').submit(function(event){
+	event.preventDefault();
 	$.ajax({
 		url: '/mosaic',
 		type: 'POST',
@@ -9,6 +10,12 @@ $('#mosaicgenerator').click(function(){
 		data: {fbid: authData.userID, theme: 'like'},
 		success: function(data){
 			console.log(data);
+			$('.animation').show()
+			$('#about').hide();
+			$(".progress").show();
+			$('.message').show();
+			$("#mosaicgenerator").hide();
+			$(".drop").hide();
 		}
 
 	})
@@ -16,14 +23,23 @@ $('#mosaicgenerator').click(function(){
 
 
 $(document).ready(function(){
+	$("select#choice").val("like");
+	$('.checkbox').hide();
+	$('.animation').hide();
 	$('#mosaicgenerator').hide();
   	$('.progress').hide();
   	$('.message').hide();
   	$('.drop').hide();
-	
-	$(".dropdown-menu li a").click(function(){
+	console.log($("select#choice").val());
+	$("#like").click(function(){
+		$(".checkbox").hide();
+	});
+	$("#travel").click(function(){
+		$(".checkbox").show();
+	});
+	$("#choice").click(function(){
 		$("#mosaicgenerator").show();
-      $(".default").text($(this).text());
+      
    
       
       $(".progress").hide();
@@ -31,11 +47,7 @@ $(document).ready(function(){
       $(".message").text($(this).text()+" is being generated!");
    });
 	$("#mosaicgenerator").click(function(){
-		$('#about').hide();
-		$(".progress").show();
-		$('.message').show();
-		$("#mosaicgenerator").hide();
-		$(".drop").hide();
+		
 	});
   
   

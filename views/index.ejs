@@ -33,46 +33,74 @@
 
 		  	<div class="col-md-4"></div>
 			  	<div class="col-md-4 drop" style="text-align:center;">
-			  		<h3>You are what you </h3>
 			  		
-						<div class="btn-group ">
+			  		<form id="mosaicform" action="/mosaic">
+						<!--<div class="btn-group ">
 
 					    <button class="btn  default" style="position:relative;">......</button>
 					    <button class="btn  dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					    <span class="caret"></span>
 					   </button>
-				 		<ul class="dropdown-menu" class="list-unstyled" role="menu" aria-labelledby="dropdownMenu">
+				 		<ul class="dropdown-menu" class="list-unstyled" role="menu" aria-labelledby="dropdownMenu"> -->
+				 		You are what you
+				 	   <select name="choice" id="choice" >
+				 	   	  	
+						   <option value="like" id="like">Like</option>
+						   <option value="travel" id="travel">Travel</option>
 
-					   <li><a value="like" href="#">Like</a></li>
-					   <li><a value="travel" href="#">Travel</a></li>
-					   
-					 	</ul>
-						</div>
-					
-
+					   </select>
+					   <div class="checkbox">
+					    <label class="checkbox-inline">
+					      <input type="checkbox" value="London"> London
+					    </label>
+					    <label class="checkbox-inline">
+					      <input type="checkbox" value="Bangkok"> Bangkok
+					    </label>
+					    <label class="checkbox-inline">
+					      <input type="checkbox" value="Paris"> Paris
+					    </label>
+					    <label class="checkbox-inline">
+					      <input type="checkbox" value="Dubai"> Dubai
+					    </label>
+					    <label class="checkbox-inline">
+					      <input type="checkbox" value="Istanbul"> Istanbul
+					    </label>
+					    <label class="checkbox-inline"> 
+					      <input type="checkbox" value="New York"> New York
+					    </label>
+					    <label class="checkbox-inline"> 
+					      <input type="checkbox" value="Singapore"> Singapore
+					    </label>
+					    <label class="checkbox-inline"> 
+					      <input type="checkbox" value="Kuala Lumpur"> Kuala Lumpur
+					    </label>
+					    <label class="checkbox-inline"> 
+					      <input type="checkbox" value="Seoul"> Seoul
+					    </label>
+					    <label class="checkbox-inline"> 
+					      <input type="checkbox" value="Hong Kong">Hong Kong
+					    </label>
+					  </div>
+					  
+											 	
+			<br>
+			<br>
+						<input id='mosaicgenerator' type="submit"class="btn btn-default" value="Generate Mosaic"/>
+							
+						
+					</form>
 				</div>
 			<div class="col-md-4"></div>
-			
-			<br>
-			<br>
-			<br>
-			<br>
-			<br>
-			<br>
 
 			<div class="col-md-4"></div>
-			<div class="col-md-4" style="text-align:center;">
-				<div id='mosaicgenerator' type="button"class="btn btn-default">
-						Generate Mosaic
+				<div class="col-md-4">
+					<div class="animation">
+					<h3>Loading </h3>
+					</div>
 				</div>
-			</div>
 			<div class="col-md-4"></div>
-	  	
-
 </div>
 
-
-	
 
 <br>
 <canvas id="new_canvas" width="1200" height="1200" style="text-align:center;padding-left: 0;
@@ -83,6 +111,7 @@
 Your browser does not support the HTML5 canvas tag.
 </canvas>
 
-</div>
+
+
 
 <% include footer.ejs %>
