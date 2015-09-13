@@ -292,10 +292,10 @@ var getAverageColorOfRegion = function (pixels, width, xBounds, yBounds) {
 
 var splitProfilePicture = function (pixels, size, resolution) {
   // pixels - pixelGetter.get
-  // resolution - int (defaults to 48)
+  // resolution - int (defaults to 50)
   // DO NOT ASSUME SIZE!!!
   // returns a 2d array
-  if (!resolution) resolution = 48;
+  if (!resolution) resolution = 50;
   var interval = size / resolution;
   var ret = [];
   for (var ro = 0; ro < resolution; ro++) {
