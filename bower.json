@@ -12,5 +12,12 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.5",
+    "bootstrap-social": "~4.10.1",
+    "components-font-awesome": "~4.4.0",
+    "firebase": "~2.2.9",
+    "jquery": "~2.1.4"
+  }
 }
