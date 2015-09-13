@@ -5,6 +5,9 @@ var router = express.Router();
 router.get('/', function (req, res, next) {
   res.render('index', { title: 'Mosaic Ninja' });
 });
+router.get('/about', function (req, res, next) {
+  res.render('about', { title: 'Mosaic Ninja' });
+});
 
 router.get('/about', function (req, res, next) {
   res.render('about', { title: 'About Mosaic Ninja' });
