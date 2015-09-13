@@ -13,7 +13,7 @@ $('#mosaicform').submit(function(event){
 	for(var i =0; i<destinations.length; i++){
 		console.log(destinations[i]);
 	}
-	if((destinations.length>5 || destinations.length<2 )&& selected === "travel"){
+	if((destinations.length>4 || destinations.length<2 )&& selected === "travel"){
 		console.log('error');
 		$('.error').replaceWith("<p>You need to select at least two and less than five</p>");
 	}else{
@@ -45,6 +45,7 @@ $('#mosaicform').submit(function(event){
 
 $(document).ready(function(){
 	$('.success').hide();
+	$('#new_canvas').hide();
 	$("select#choice").val("like");
 	$('.checkbox').hide();
 	$('.animation').hide();
@@ -54,6 +55,7 @@ $(document).ready(function(){
   	$('.drop').hide();
 	
 	$("#like").click(function(){
+		$(".error").replaceWith("<p></p>");
 		$(".checkbox").hide();
 	});
 	$("#travel").click(function(){

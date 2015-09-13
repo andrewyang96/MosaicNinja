@@ -85,6 +85,7 @@
       authData = response.authResponse;
 
       $('.drop').show();
+      $('#about').hide();
       $("#mosaicgenerator").show();
 
      
@@ -117,6 +118,8 @@
               }
             }
             console.log("Finished drawing canvas!");
+            $("#new_canvas").show();
+            $(".success").replaceWith("<h2 class='lead'>Right click to Save the Image</h2>");
           }, function (err) {
             console.log("Error drawing canvas:", err);
           });
