@@ -44,11 +44,11 @@ router.post('/', function (req, res, next) {
         };
         var tree = kdt.createKdTree(coords, distance, ["r", "g", "b"]);
         // download profile picture
-        downloadProfilePicture(req.body.fbid, function (err, propicImage) {
+        downloadProfilePicture(req.body.fbid, function (err, propicImage, size) {
           if (err) throw err;
           pixelGetter.get(new Buffer(propicImage, 'base64'), function (err, pixels) {
             if (err) throw err;
-            var mosaic = splitProfilePicture(pixels); // optional resolution param
+            var mosaic = splitProfilePicture(pixels, size);
             var nearests = returnNearests(tree, mosaic);
             nearests.lastUpdated = Firebase.ServerValue.TIMESTAMP; // guarantee trigger child_changed
             mosaicsRef.child(req.body.fbid).set(nearests, function (error) {
@@ -171,13 +171,13 @@ var downloadProfilePicture = function (id, callback) {
     }
     encodeBase64(propicData.data.url, function (err, image) {
       if (err) {
-        callback(err, null);
+        callback(err, null, null);
         return;
       }
       if (image) {
-        callback(null, image);
+        callback(null, image, propicData.data.width);
       } else {
-        callback("image is null", null);
+        callback("image is null", null, null);
       }
     });
   });
@@ -267,14 +267,14 @@ var getAverageColor = function (pixels) {
   return { r: Math.floor(r), g: Math.floor(g), b: Math.floor(b) };
 };
 
-var getAverageColorOfRegion = function (pixels, xBounds, yBounds) {
+var getAverageColorOfRegion = function (pixels, width, xBounds, yBounds) {
   var numPixels = (xBounds[1] - xBounds[0]) * (yBounds[1] - yBounds[0]);
   var r = 0;
   var g = 0;
   var b = 0;
   for (var x = xBounds[0]; x < xBounds[1]; x++) {
     for (var y = yBounds[0]; y < yBounds[1]; y++) {
-      var pixel = pixels[0][x * 768 + y];
+      var pixel = pixels[0][x * width + y];
       if (pixel) {
         r += pixel.r;
         g += pixel.g;
@@ -290,13 +290,13 @@ var getAverageColorOfRegion = function (pixels, xBounds, yBounds) {
   return { r: Math.floor(r), g: Math.floor(g), b: Math.floor(b) };
 };
 
-var splitProfilePicture = function (pixels, resolution) {
+var splitProfilePicture = function (pixels, size, resolution) {
   // pixels - pixelGetter.get
   // resolution - int (defaults to 48)
-  // Assume 768x768, divisible by 24, 32, 48, 64
+  // DO NOT ASSUME SIZE!!!
   // returns a 2d array
   if (!resolution) resolution = 48;
-  var interval = 768 / resolution;
+  var interval = size / resolution;
   var ret = [];
   for (var ro = 0; ro < resolution; ro++) {
     var row = [];
@@ -304,10 +304,11 @@ var splitProfilePicture = function (pixels, resolution) {
       console.log("Calculating row =", ro, "and col =", c);
       var xBounds = [Math.floor(c * interval), Math.floor((c+1) * interval)];
       var yBounds = [Math.floor(ro * interval), Math.floor((ro+1) * interval)];
-      row.push(getAverageColorOfRegion(pixels, xBounds, yBounds));
+      row.push(getAverageColorOfRegion(pixels, size, xBounds, yBounds));
     }
     ret.push(row);
   }
+  console.log("Size is square px:", size);
   return ret;
 };
 
