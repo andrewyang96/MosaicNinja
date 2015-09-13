@@ -6,9 +6,7 @@ $('#mosaicform').submit(function(event){
 	var selected = $("select#choice").val();
 	var destinations = [];
 	var checkbox = $('.checkbox input:checked').each(function(){
-		destinations.push(this.value);
-
-		
+		destinations.push(this.value);		
 	});
 	for(var i =0; i<destinations.length; i++){
 		console.log(destinations[i]);
@@ -19,22 +17,23 @@ $('#mosaicform').submit(function(event){
 	}else{
 		
 		$('.checkbox input:checked').removeAttr('checked');
+    console.log("Destinations:", destinations);
 		$.ajax({
-		url: '/mosaic',
-		type: 'POST',
-		dataType: 'json',
-		data: {fbid: authData.userID, theme: selected, cities:destinations},
-		success: function(data){
-			console.log(data);
-			$('.success').show();
-			$('#about').hide();
-			$(".progress").show();
-			$('.message').show();
-			$("#mosaicgenerator").hide();
-			$(".drop").hide();
-			}
+  		url: '/mosaic',
+  		type: 'POST',
+  		dataType: 'json',
+  		data: {fbid: authData.userID, theme: selected, cities: destinations},
+  		success: function(data){
+  			console.log(data);
+  			$('.success').show();
+  			$('#about').hide();
+  			$(".progress").show();
+  			$('.message').show();
+  			$("#mosaicgenerator").hide();
+  			$(".drop").hide();
+  		}
 
-		})
+		});
 	}
 	
 	
@@ -49,31 +48,27 @@ $(document).ready(function(){
 	$('.checkbox').hide();
 	$('.animation').hide();
 	$('#mosaicgenerator').hide();
-  	$('.progress').hide();
-  	$('.message').hide();
-  	$('.drop').hide();
-	
-	$("#like").click(function(){
-		$(".checkbox").hide();
-	});
-	$("#travel").click(function(){
-		$(".checkbox").show();
-	});
+  $('.progress').hide();
+  $('.message').hide();
+  $('.drop').hide();
+
+  $("#choice").change(function () {
+    if ($("#choice").val() === "travel") {
+      $(".checkbox").show();
+    } else {
+      $(".checkbox").hide();
+    }
+  });
 	$("#choice").click(function(){
 		$("#mosaicgenerator").show();
-      
-   
-      
-      $(".progress").hide();
+    $(".progress").hide();
 	  $('.message').hide();
-      $(".message").text($(this).text()+" is being generated!");
-   });
+    $(".message").text($(this).text()+" is being generated!");
+  });
 	$("#mosaicgenerator").click(function(){
 
 		
 	});
-  
-  
 
 });
 

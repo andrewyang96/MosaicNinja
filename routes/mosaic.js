@@ -46,12 +46,13 @@ router.post('/', function (req, res, next) {
   res.send({ "socket": "/mosaic/" + req.body.fbid });
   if (req.body.theme === "like") {
     // Facebook
+    console.log("Making Facebook mosaic");
     getLikes(req.body.fbid, function (err, likes) {
       if (err) throw err;
       downloadPictures(likes, function (err, imageData) {
         if (err) throw err;
         // Adding to KD-tree
-        var coords = []
+        var coords = [];
         _.each(imageData, function (value, key) {
           var point = getAverageColor(value.pixels);
           point.b64 = value.base64;
@@ -81,11 +82,14 @@ router.post('/', function (req, res, next) {
     });
   } else if (req.body.theme === "travel") {
     // Expedia
-    getCities(req.body.cities, function (err, images) {
+    console.log("Making Expedia mosaic");
+    getCities(req.body["cities[]"], function (err, images) {
       if (err) throw err;
       downloadCities(images, function (err, citiesImages) {
+        if (err) throw err;
         // construct KD-tree
-        var coords = []
+        var coords = [];
+        console.log(citiesImages);
         for (var i = 0; i < citiesImages.length; i++) {
           var point = citiesImages[i];
           point.r = point.avgColor.r;
@@ -94,6 +98,8 @@ router.post('/', function (req, res, next) {
           delete point.avgColor;
           coords.push(point);
         }
+        console.log("Coords");
+        console.log(coords);
         var tree = kdt.createKdTree(coords, distance, ["r", "g", "b"]);
         // download profile picture
         downloadProfilePicture(req.body.fbid, function (err, propicImage, size) {
@@ -242,14 +248,17 @@ var getCityPhotos = function (city, callback) {
     }
   }, function (err, res, body) {
     if (err) throw err;
+    console.log("Got response for photos from", city);
     if (body && res.statusCode === 200) {
       var j = JSON.parse(body);
       var ret = [];
       for (var i = 0; i < j.activities.length; i++) {
+        console.log("Pushing item", i, "for city", city);
         ret.push(j.activities[i].imageUrl);
       }
       callback(null, ret);
     } else {
+      console.log("Error getting", city);
       callback(null, null);
     }
   });
@@ -277,35 +286,42 @@ var getCities = function (cities, callback) {
 };
 
 var downloadCities = function (cities, callback) {
-  // cities - object with city key and array of images value
+  // cities - object with city key and array of images URL value
   // returns list of RGB avgs and base64s
+  // first flatten array
+  var inputImages = [];
+  _.each(cities, function (value, key) {
+    inputImages = inputImages.concat(value);
+  });
   var ret = [];
-  async.each(Object.keys(cities), function (city, cb) {
-    var cityImages = []
-    async.each(cities[city], function (url, cb2) {
-      cropPicture(url, function (err, buf, b64) {
-        pixelGetter.get(buf, function (err, pixels) {
-          var avgColor = getAverageColor(pixels);
-          cityImages.push({
-            avgColor: pixels,
-            b64: b64
-          });
-          cb2();
-        });
-      });
-    }, function (err) {
+  async.each(inputImages, function (url, cb) {
+    console.log("Finding image at URL", url);
+    cropPicture("http:" + url, function (err, buf, b64) {
       if (err) {
         cb(err, null);
         return;
       }
-      ret = ret.concat(cityImages);
-      cb(null, cityImages);
+      pixelGetter.get(buf, function (err, pixels) {
+        if (err) {
+          cb(err, null);
+          return;
+        }
+        var avgColor = getAverageColor(pixels);
+        console.log("Pushing city image:", url);
+        ret.push({
+          avgColor: pixels,
+          b64: b64
+        });
+        cb();
+      });
     });
   }, function (err) {
     if (err) {
+      console.log("Error in downloadCities");
       callback(err, null);
       return;
     }
+    console.log("Downloaded city images!");
     callback(null, ret);
   });
 };
@@ -313,19 +329,26 @@ var downloadCities = function (cities, callback) {
 var cropPicture = function (url, callback) {
   // crop pictures from 350x197
   // returns buffer and base64
+  console.log(url);
   encodeBase64(url, function (err, image) {
     if (err) {
       callback(err, null);
       return;
     }
+    if (!image) {
+      callback("Image not found", null);
+      return;
+    }
     var buf = new Buffer(image, 'base64');
     var image = new Jimp(buf, function (err, image) {
       if (err) {
+        console.log("Error in cropping");
         callback(err, null);
         return;
       }
       // crop then resize down to 50x50
-      this.crop(76, 0, 197, 197).resize(50, 50).getBuffer(Jimp.MIME_JPEG, function (err, buffer) {
+      image.crop(76, 0, 197, 197).resize(50, 50);
+      image.getBuffer(Jimp.MIME_JPEG, function (err, buffer) {
         if (err) {
           callback(err, null);
           return;
@@ -339,15 +362,24 @@ var cropPicture = function (url, callback) {
 /* Begin general mosaic methods */
 
 var encodeBase64 = function (url, callback) {
-  request({url: url, encoding: null}, function (err, res, body) {
+  console.log("URLLLLLL", url)
+  request({
+    url: url,
+    headers: {
+      'User-Agent': 'request'
+    }
+  }, function (err, res, body) {
     if (err) {
       callback(err, null);
       return;
     }
     if (body && res.statusCode === 200) {
+      console.log("Successful request");
       var image = body.toString('base64');
       callback(null, image);
     } else {
+      console.log(url, res.statusCode);
+      console.log(body.length);
       callback(null, null);
     }
   });
@@ -403,8 +435,8 @@ var splitProfilePicture = function (pixels, size, resolution) {
   var ret = [];
   for (var ro = 0; ro < resolution; ro++) {
     var row = [];
+    console.log("Calculating row =", ro);
     for (var c = 0; c < resolution; c++) {
-      console.log("Calculating row =", ro, "and col =", c);
       var xBounds = [Math.floor(c * interval), Math.floor((c+1) * interval)];
       var yBounds = [Math.floor(ro * interval), Math.floor((ro+1) * interval)];
       row.push(getAverageColorOfRegion(pixels, size, xBounds, yBounds));
@@ -421,8 +453,8 @@ var returnNearests = function (tree, mosaic) {
   var ret = []
   for (var row = 0; row < mosaic.length; row++) {
     var rowRet = [];
+    console.log("Calcing nearest for row", row)
     for (var col = 0; col < mosaic[row].length; col++) {
-      console.log("Calcing nearest of row", row, "and col", col);
       var nearest = tree.nearest(mosaic[row][col], 1);
       rowRet.push(nearest[0][0]);
     }
