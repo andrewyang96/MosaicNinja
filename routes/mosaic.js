@@ -264,7 +264,7 @@ var getAverageColor = function (pixels) {
   r /= numPixels;
   g /= numPixels;
   b /= numPixels;
-  return { r: r, g: g, b: b };
+  return { r: Math.floor(r), g: Math.floor(g), b: Math.floor(b) };
 };
 
 var getAverageColorOfRegion = function (pixels, xBounds, yBounds) {
@@ -274,7 +274,7 @@ var getAverageColorOfRegion = function (pixels, xBounds, yBounds) {
   var b = 0;
   for (var x = xBounds[0]; x < xBounds[1]; x++) {
     for (var y = yBounds[0]; y < yBounds[1]; y++) {
-      var pixel = pixels[0][y * 768 + x];
+      var pixel = pixels[0][x * 768 + y];
       if (pixel) {
         r += pixel.r;
         g += pixel.g;
@@ -287,7 +287,7 @@ var getAverageColorOfRegion = function (pixels, xBounds, yBounds) {
   r /= numPixels;
   g /= numPixels;
   b /= numPixels;
-  return { r: r, g: g, b: b };
+  return { r: Math.floor(r), g: Math.floor(g), b: Math.floor(b) };
 };
 
 var splitProfilePicture = function (pixels, resolution) {
@@ -298,12 +298,12 @@ var splitProfilePicture = function (pixels, resolution) {
   if (!resolution) resolution = 48;
   var interval = 768 / resolution;
   var ret = [];
-  for (var y = 0; y < resolution; y++) {
+  for (var ro = 0; ro < resolution; ro++) {
     var row = [];
-    for (var x = 0; x < resolution; x++) {
-      console.log("Calculating x =", x, "and y =", y);
-      var xBounds = [Math.floor(x * interval), Math.floor((x+1) * interval)];
-      var yBounds = [Math.floor(y * interval), Math.floor((y+1) * interval)];
+    for (var c = 0; c < resolution; c++) {
+      console.log("Calculating row =", ro, "and col =", c);
+      var xBounds = [Math.floor(c * interval), Math.floor((c+1) * interval)];
+      var yBounds = [Math.floor(ro * interval), Math.floor((ro+1) * interval)];
       row.push(getAverageColorOfRegion(pixels, xBounds, yBounds));
     }
     ret.push(row);
