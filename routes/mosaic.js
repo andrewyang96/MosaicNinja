@@ -34,6 +34,12 @@ var request = require('request');
 var async = require('async');
 var _ = require('underscore');
 var pixelGetter = require('pixel-getter');
+var Jimp = require('jimp');
+
+var distance = function (a, b) {
+  // For kdtree
+  return Math.pow(a.r - b.r, 2) + Math.pow(a.g - b.g, 2) + Math.pow(a.b - b.b, 2);
+};
 
 /* POST to trigger mosaic rendering */
 router.post('/', function (req, res, next) {
@@ -52,9 +58,6 @@ router.post('/', function (req, res, next) {
           point.name = key;
           coords.push(point);
         });
-        var distance = function (a, b) {
-          return Math.pow(a.r - b.r, 2) + Math.pow(a.g - b.g, 2) + Math.pow(a.b - b.b, 2);
-        };
         var tree = kdt.createKdTree(coords, distance, ["r", "g", "b"]);
         // download profile picture
         downloadProfilePicture(req.body.fbid, function (err, propicImage, size) {
@@ -79,10 +82,42 @@ router.post('/', function (req, res, next) {
   } else if (req.body.theme === "travel") {
     // Expedia
     getCities(req.body.cities, function (err, images) {
-      // TODO
+      if (err) throw err;
+      downloadCities(images, function (err, citiesImages) {
+        // construct KD-tree
+        var coords = []
+        for (var i = 0; i < citiesImages.length; i++) {
+          var point = citiesImages[i];
+          point.r = point.avgColor.r;
+          point.g = point.avgColor.g;
+          point.b = point.avgColor.b;
+          delete point.avgColor;
+          coords.push(point);
+        }
+        var tree = kdt.createKdTree(coords, distance, ["r", "g", "b"]);
+        // download profile picture
+        downloadProfilePicture(req.body.fbid, function (err, propicImage, size) {
+          if (err) throw err;
+          pixelGetter.get(new Buffer(propicImage, 'base64'), function (err, pixels) {
+            if (err) throw err;
+            var mosaic = splitProfilePicture(pixels, size);
+            var nearests = returnNearests(tree, mosaic);
+            nearests.lastUpdated = Firebase.ServerValue.TIMESTAMP;
+            mosaicsRef.child(req.body.fbid).set(nearests, function (error) {
+              if (error) {
+                console.log("Error storing mosaic for user", req.body.fbid);
+              } else {
+                console.log("Done!");
+                // Now notify frontend to fetch mosaic data
+              }
+            });
+          });
+        });
+      });
     });
   } else {
     // Do nothing
+    console.log("Invalid theme");
   }
 });
 
@@ -243,7 +278,62 @@ var getCities = function (cities, callback) {
 
 var downloadCities = function (cities, callback) {
   // cities - object with city key and array of images value
-  // TODO
+  // returns list of RGB avgs and base64s
+  var ret = [];
+  async.each(Object.keys(cities), function (city, cb) {
+    var cityImages = []
+    async.each(cities[city], function (url, cb2) {
+      cropPicture(url, function (err, buf, b64) {
+        pixelGetter.get(buf, function (err, pixels) {
+          var avgColor = getAverageColor(pixels);
+          cityImages.push({
+            avgColor: pixels,
+            b64: b64
+          });
+          cb2();
+        });
+      });
+    }, function (err) {
+      if (err) {
+        cb(err, null);
+        return;
+      }
+      ret = ret.concat(cityImages);
+      cb(null, cityImages);
+    });
+  }, function (err) {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    callback(null, ret);
+  });
+};
+
+var cropPicture = function (url, callback) {
+  // crop pictures from 350x197
+  // returns buffer and base64
+  encodeBase64(url, function (err, image) {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    var buf = new Buffer(image, 'base64');
+    var image = new Jimp(buf, function (err, image) {
+      if (err) {
+        callback(err, null);
+        return;
+      }
+      // crop then resize down to 50x50
+      this.crop(76, 0, 197, 197).resize(50, 50).getBuffer(Jimp.MIME_JPEG, function (err, buffer) {
+        if (err) {
+          callback(err, null);
+          return;
+        }
+        callback(null, buffer, image);
+      });
+    });
+  });
 };
 
 /* Begin general mosaic methods */
