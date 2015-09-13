@@ -49,31 +49,27 @@ $(document).ready(function(){
 	$('.checkbox').hide();
 	$('.animation').hide();
 	$('#mosaicgenerator').hide();
-  	$('.progress').hide();
-  	$('.message').hide();
-  	$('.drop').hide();
-	
-	$("#like").click(function(){
-		$(".checkbox").hide();
-	});
-	$("#travel").click(function(){
-		$(".checkbox").show();
-	});
+  $('.progress').hide();
+  $('.message').hide();
+  $('.drop').hide();
+
+  $("#choice").change(function () {
+    if ($("#choice").val() === "travel") {
+      $(".checkbox").show();
+    } else {
+      $(".checkbox").hide();
+    }
+  });
 	$("#choice").click(function(){
 		$("#mosaicgenerator").show();
-      
-   
-      
-      $(".progress").hide();
+    $(".progress").hide();
 	  $('.message').hide();
-      $(".message").text($(this).text()+" is being generated!");
-   });
+    $(".message").text($(this).text()+" is being generated!");
+  });
 	$("#mosaicgenerator").click(function(){
 
 		
 	});
-  
-  
 
 });
 
