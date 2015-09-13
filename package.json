@@ -17,6 +17,7 @@
     "facebook-node-sdk": "^0.2.0",
     "firebase": "^2.2.9",
     "get-pixels": "^3.2.3",
+    "jimp": "^0.2.5",
     "kdt": "^0.1.0",
     "morgan": "~1.6.1",
     "ndarray": "^1.0.18",
