@@ -25,45 +25,55 @@ var pixelGetter = require('pixel-getter');
 /* POST to trigger mosaic rendering */
 router.post('/', function (req, res, next) {
   res.send({ "socket": "/mosaic/" + req.body.fbid });
-  getLikes(req.body.fbid, function (err, likes) {
-    if (err) throw err;
-    downloadPictures(likes, function (err, imageData) {
+  if (req.body.theme === "like") {
+    // Facebook
+    getLikes(req.body.fbid, function (err, likes) {
       if (err) throw err;
-      // Adding to KD-tree
-      var coords = []
-      _.each(imageData, function (value, key) {
-        var point = getAverageColor(value.pixels);
-        point.b64 = value.base64;
-        point.name = key;
-        coords.push(point);
-      });
-      var distance = function (a, b) {
-        
-        return Math.pow(a.r - b.r, 2) + Math.pow(a.g - b.g, 2) + Math.pow(a.b - b.b, 2);
-      };
-      var tree = kdt.createKdTree(coords, distance, ["r", "g", "b"]);
-      // download profile picture
-      downloadProfilePicture(req.body.fbid, function (err, propicImage) {
+      downloadPictures(likes, function (err, imageData) {
         if (err) throw err;
-        pixelGetter.get(new Buffer(propicImage, 'base64'), function (err, pixels) {
+        // Adding to KD-tree
+        var coords = []
+        _.each(imageData, function (value, key) {
+          var point = getAverageColor(value.pixels);
+          point.b64 = value.base64;
+          point.name = key;
+          coords.push(point);
+        });
+        var distance = function (a, b) {
+          return Math.pow(a.r - b.r, 2) + Math.pow(a.g - b.g, 2) + Math.pow(a.b - b.b, 2);
+        };
+        var tree = kdt.createKdTree(coords, distance, ["r", "g", "b"]);
+        // download profile picture
+        downloadProfilePicture(req.body.fbid, function (err, propicImage) {
           if (err) throw err;
-          var mosaic = splitProfilePicture(pixels); // optional resolution param
-          var nearests = returnNearests(tree, mosaic);
-          mosaicsRef.child(req.body.fbid).set(nearests, function (error) {
-            if (error) {
-              console.log("Error storing mosaic for user", req.body.fbid);
-            } else {
-              console.log("Done!");
-              // TODO notify frontend to fetch mosaic data
-            }
+          pixelGetter.get(new Buffer(propicImage, 'base64'), function (err, pixels) {
+            if (err) throw err;
+            var mosaic = splitProfilePicture(pixels); // optional resolution param
+            var nearests = returnNearests(tree, mosaic);
+            nearests.lastUpdated = Firebase.ServerValue.TIMESTAMP; // guarantee trigger child_changed
+            mosaicsRef.child(req.body.fbid).set(nearests, function (error) {
+              if (error) {
+                console.log("Error storing mosaic for user", req.body.fbid);
+              } else {
+                console.log("Done!");
+                // Now notify frontend to fetch mosaic data
+              }
+            });
           });
         });
       });
     });
-  });
+  } else if (req.body.theme === "travel") {
+    // Expedia
+    getCities(req.body.cities, function (err, images) {
+      // TODO
+    });
+  } else {
+    // Do nothing
+  }
 });
 
-/* Begin mosaic making methods */
+/* Begin Facebook mosaic making methods */
 
 var getLikes = function (id, callback) {
   facebook.api('/' + id + '/likes?limit=100', function (err, data) {
@@ -173,6 +183,58 @@ var downloadProfilePicture = function (id, callback) {
   });
 };
 
+/* Begin Expedia mosaic methods */
+
+var getCityPhotos = function (city, callback) {
+  // Pull image URLs from Expedia's Activities API
+  request({
+    url: "http://terminal2.expedia.com/x/activities/search?location=" + city + "&apikey=" + config.expediaKey,
+    headers: {
+      'User-Agent': 'request'
+    }
+  }, function (err, res, body) {
+    if (err) throw err;
+    if (body && res.statusCode === 200) {
+      var j = JSON.parse(body);
+      var ret = [];
+      for (var i = 0; i < j.activities.length; i++) {
+        ret.push(j.activities[i].imageUrl);
+      }
+      callback(null, ret);
+    } else {
+      callback(null, null);
+    }
+  });
+};
+
+var getCities = function (cities, callback) {
+  // cities - array of 2 to 5 cities
+  var ret = {};
+  async.each(cities, function (city, cb) {
+    getCityPhotos(city, function (err, images) {
+      if (err) {
+        cb(err, null);
+        return;
+      }
+      ret[city] = images;
+      cb();
+    });
+  }, function (err) {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    callback(null, ret);
+  });
+};
+
+var downloadCities = function (cities, callback) {
+  // cities - object with city key and array of images value
+  // TODO
+};
+
+/* Begin general mosaic methods */
+
 var encodeBase64 = function (url, callback) {
   request({url: url, encoding: null}, function (err, res, body) {
     if (err) {
@@ -230,10 +292,10 @@ var getAverageColorOfRegion = function (pixels, xBounds, yBounds) {
 
 var splitProfilePicture = function (pixels, resolution) {
   // pixels - pixelGetter.get
-  // resolution - int (defaults to 24)
+  // resolution - int (defaults to 48)
   // Assume 768x768, divisible by 24, 32, 48, 64
   // returns a 2d array
-  if (!resolution) resolution = 24;
+  if (!resolution) resolution = 48;
   var interval = 768 / resolution;
   var ret = [];
   for (var y = 0; y < resolution; y++) {

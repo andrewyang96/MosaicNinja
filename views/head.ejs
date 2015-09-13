@@ -14,6 +14,8 @@
     <link rel="stylesheet" type="text/css" href="/components/components-font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="/components/bootstrap-social/bootstrap-social.css">
 
+    <script type="text/javascript" src="/components/firebase/firebase.js"></script>
+
 </head>
 <body>
 
@@ -59,56 +61,50 @@
   // Check the result of the user status and display login button if necessary
   function checkLoginStatus(response) {
     if(response.status == 'connected') {
-      console.log(response.status);
       authData = response.authResponse;
+
       $('.btn-group').show();
+
+     
+
       var ref = new Firebase("https://facebookmosaic.firebaseio.com/");
-      var mosaicsref= ref.child("mosaics").child(authData.userID);
+      var mosaicsref = ref.child("mosaics").child(authData.userID);
       
-    mosaicsref.on('child_changed',function(childSnapshot,prevChildKey){
-      mosaicsref.once('value',function(dataSnapshot){
-          
+      console.log("Loading firebase", authData.userID);
+      mosaicsref.on('child_changed', function (childSnapshot, prevChildKey) {
+        console.log("Child_changed triggered");
+        mosaicsref.once('value', function (dataSnapshot) {
           var source = dataSnapshot.val();
           console.log(source);
-          //example
-          /*
+
+        
           var canvas = document.getElementById('new_canvas');
           var context = canvas.getContext('2d');
-          var imageObj = new Image();
+          delete source.lastUpdated; // delete lastUpdated key
+          for (var row=0; row < Object.keys(source).length; row++) {
+            for (var col=0; col < source[row].length; col++) {
+              var pixel = source[row][col];
+              console.log("Doing row", row, "and col", col);
+              var img = new Image();
+              img.src = "data:image/jpeg;base64," + pixel.b64;
+              img.row = row;
+              img.col = col;
+              img.onload = function () {
+                context.drawImage(this, this.row*25, this.col*25, 25, 25);
+              };
 
-          imageObj.onload = function() {
-            context.drawImage(imageObj, 69, 50);
-          };
-          imageObj.src = 'http://www.html5canvastutorials.com/demos/assets/darth-vader.jpg';
-          //actual
-          */
-          for(var row=0; row< source.length; row++){
-            for(var col=0;col<source[row].length;col++){
-
-               var ctx = document.getElementById('new_canvas').getContext('2d');
-                var pixel = source[row][col];
-                var img = new Image();
-              
-                //"data:image/jpeg;base64,"+pixel;
-                img.onload = function (){
-                    ctx.drawImage(img,row*50,col*50);
-                  }
-                img.src = "http://www.html5canvastutorials.com/demos/assets/darth-vader.jpg";
             }
           }
-        },
-        function(err){
-          console.log(err);
+        }, function (err){
+          console.log("Error drawing canvas:", err);
         });
-      
-      }
-    );
+      });
 
       // Hide the login button
       document.getElementById('loginButton').style.display = 'none';
       
       // Now Personalize the User Experience
-      console.log('Access Token: ' + response.authResponse.accessToken);
+      // console.log('Access Token: ' + response.authResponse.accessToken);
     } else {
       
       
@@ -118,11 +114,6 @@
   }
 
 </script>
-<script type="text/javascript" src="/components/firebase/firebase.js"></script>
-    
-
-
-
 
 
 <!-- header -->

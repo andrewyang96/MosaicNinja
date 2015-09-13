@@ -5,4 +5,6 @@ config.fbAppSecret = "";
 
 config.firebaseSecret = "";
 
+config.expediaKey = "";
+
 module.exports = config;
