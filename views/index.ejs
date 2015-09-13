@@ -1,14 +1,16 @@
 <% include head.ejs %>
 
 
-<div class="container">
+<div class="container" >
 	<div class="page-header text-center">
 		<h1> Welcome to MosaicNinja</h1>
+		<p>NOTE: The rainbow filter for Facebook's Celebrate Pride will likely distort the mosaic.</p>
 	</div>
-<p>NOTE: The rainbow filter for Facebook's Celebrate Pride will likely distort the mosaic.</p>
 
+	
 	<div class="text-center">
-		<img src="http://images.cpcache.com/image/6583719.png" style="height:178px;width:180px;" />
+		<img src="http://mhacks.org/images/mhacks_logo.svg" style="height:180px;width:190px;" />
+		<img src="http://images.cpcache.com/image/6583719.png" style="height:168px;width:170px;" />
 
 		<br>
 		<br>
@@ -18,49 +20,53 @@
 		</div>
 		<div class="col-md-4"></div>
 	</div>
-	
-	
-	  	
-			<div class="progress">
+
+			<!--<div class="progress">
 
 			  	<div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
 			    60%
 			  	</div>
 
-		  	</div>
-		  	<p class="message"></p>
+		  	</div>-->
+		  	
 	  	
 
 		  	<div class="col-md-4"></div>
-		  	
-			<div class="btn-group col-md-4">
+			  	<div class="col-md-4 drop" style="text-align:center;">
+			  		<h3>You are what you </h3>
+			  		
+						<div class="btn-group ">
 
-		    <button class="btn btn-lg">You are what you</button>
-		    <button class="btn btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		    <span class="caret"></span>
-		   </button>
-	 		<ul class="dropdown-menu" class="list-unstyled" role="menu" aria-labelledby="dropdownMenu">
+					    <button class="btn  default" style="position:relative;">......</button>
+					    <button class="btn  dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					    <span class="caret"></span>
+					   </button>
+				 		<ul class="dropdown-menu" class="list-unstyled" role="menu" aria-labelledby="dropdownMenu">
 
-		   <li><a tabindex="1" href="#">You are what you Like</a></li>
-		   <li><a tabindex="2" href="#">You are what you Eat</a></li>
-		   <li><a tabindex="3" href="#">You are what you Experience</a></li>
-		   
-		 	</ul>
-			</div>
+					   <li><a value="like" href="#">Like</a></li>
+					   <li><a value="travel" href="#">Travel</a></li>
+					   
+					 	</ul>
+						</div>
+					
+
+				</div>
 			<div class="col-md-4"></div>
+			
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
 			<br>
 
-			
-				
-				<br>
-				<br>
-				<div class="col-md-4"></div>
-				<div class="col-md-4">
-					<div id='mosaicgenerator' type="button"class="btn btn-default">
-							Generate Mosaic
-					</div>
+			<div class="col-md-4"></div>
+			<div class="col-md-4" style="text-align:center;">
+				<div id='mosaicgenerator' type="button"class="btn btn-default">
+						Generate Mosaic
 				</div>
-				<div class="col-md-4"></div>
+			</div>
+			<div class="col-md-4"></div>
 	  	
 
 </div>
@@ -69,7 +75,11 @@
 	
 
 <br>
-<canvas id="new_canvas" width="1200" height="1200">
+<canvas id="new_canvas" width="1200" height="1200" style="text-align:center;padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;">
 Your browser does not support the HTML5 canvas tag.
 </canvas>
 
