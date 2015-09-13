@@ -1,7 +1,20 @@
 var express = require('express');
 var router = express.Router();
 
-var config = require('../config');
+// config
+var config = {};
+if (process.env.FB_APP_ID) {
+  // production
+  config.fbAppID = process.env.FB_APP_ID;
+  config.fbAppSecret = process.env.FB_APP_SECRET;
+  config.firebaseSecret = process.env.FIREBASE_SECRET;
+  config.expediaKey = process.env.EXPEDIA_KEY;
+} else {
+  // development
+  config = require('../config');
+}
+
+
 var request = require('request');
 var Facebook = require('facebook-node-sdk');
 var facebook = new Facebook({ appId: config.fbAppID, secret: config.fbAppSecret });
