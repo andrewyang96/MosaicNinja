@@ -67,30 +67,33 @@
       var mosaicsref = ref.child("mosaics").child(authData.userID);
       
       console.log("Loading firebase", authData.userID);
-      mosaicsref.on('child_changed', function (childSnapshot, prevChildKey) {
-        console.log("Child_changed triggered");
-        mosaicsref.once('value', function (dataSnapshot) {
-          var source = dataSnapshot.val();
-          console.log(source);
-          var canvas = document.getElementById('new_canvas');
-          var context = canvas.getContext('2d');
-          delete source.lastUpdated; // delete lastUpdated key
-          for (var row=0; row < Object.keys(source).length; row++) {
-            for (var col=0; col < source[row].length; col++) {
-              var pixel = source[row][col];
-              console.log("Doing row", row, "and col", col);
-              var img = new Image();
-              img.src = "data:image/jpeg;base64," + pixel.b64;
-              img.row = row;
-              img.col = col;
-              img.onload = function () {
-                context.drawImage(this, this.row*25, this.col*25, 25, 25);
-              };
+      mosaicsref.on('child_changed', function (childSnapshot) {
+        if (childSnapshot.key() === "lastUpdated") { // control
+          console.log("Last updated child_changed triggered");
+          mosaicsref.once('value', function (dataSnapshot) {
+            var source = dataSnapshot.val();
+            console.log(source);
+            var canvas = document.getElementById('new_canvas');
+            var context = canvas.getContext('2d');
+            delete source.lastUpdated; // delete lastUpdated key
+            for (var row=0; row < Object.keys(source).length; row++) {
+              console.log("Starting row", row);
+              for (var col=0; col < source[row].length; col++) {
+                var pixel = source[row][col];
+                var img = new Image();
+                img.src = "data:image/jpeg;base64," + pixel.b64;
+                img.row = row;
+                img.col = col;
+                img.onload = function () {
+                  context.drawImage(this, this.row*25, this.col*25, 25, 25);
+                };
+              }
             }
-          }
-        }, function (err){
-          console.log("Error drawing canvas:", err);
-        });
+            console.log("Finished drawing canvas!");
+          }, function (err) {
+            console.log("Error drawing canvas:", err);
+          });
+        }
       });
 
       // Hide the login button
